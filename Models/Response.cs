@@ -17,7 +17,7 @@ namespace TicketingSys.Models
         public User User { get; set; }
         public string UserId { get; set; }
 
-        public ICollection<ResponseAttachment>? Attachments { get; set; }
+        public List<ResponseAttachment> Attachments { get; set; }
 
         public string Message { get; set; }
 
