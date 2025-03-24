@@ -2,14 +2,13 @@
 
 namespace TicketingSys.Models
 {
-    public class TicketCategory
+    public class Department
     {
         [Key]
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public string Description { get; set; }
 
     }
 }

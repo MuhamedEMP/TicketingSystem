@@ -15,7 +15,7 @@ namespace TicketingSys.Models
 
 
         [Required]
-        public required string Path { get; set; }
+        public string Path { get; set; }
 
         public string FileName { get; set; }
 

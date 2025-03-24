@@ -16,11 +16,11 @@ namespace TicketingSys.Models
 
         // path or link to attached file
         [Required]
-        public required String Path { get; set; }
+        public  string Path { get; set; }
 
-        public String? FileName { get; set; }
+        public string FileName { get; set; }
 
-        public String? ContentType { get; set; }
+        public string ContentType { get; set; }
 
 
     }

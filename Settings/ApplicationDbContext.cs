@@ -15,6 +15,8 @@ namespace TicketingSys.Settings
         public DbSet<TicketAttachment> TicketAttachments { get; set; }
         public DbSet<TicketCategory> TicketCategories { get; set; }
 
+        public DbSet<Department> Departments { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions)
        : base(dbContextOptions)
         {
