@@ -6,15 +6,11 @@ namespace TicketingSys.Models
     [Tags("ResponseAttachments")]
     public class ResponseAttachment
     {
-        [Key]
         public int Id { get; set; }
 
-        [ForeignKey("Response")]
         public int ResponseId { get; set; }
         public Response Response { get; set; }
 
-
-        [Required]
         public string Path { get; set; }
 
         public string FileName { get; set; }

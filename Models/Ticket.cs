@@ -6,7 +6,6 @@ namespace TicketingSys.Models
 {
     public class Ticket
     {
-        [Key]
         public int Id { get; set; }
 
         // references the user who submitted the ticket
@@ -18,12 +17,10 @@ namespace TicketingSys.Models
         public User? AssignedTo { get; set; }
 
         // no hard coded categories all will be saved in category table
-        [ForeignKey("Category")]
         public int CategoryId { get; set; }
         public TicketCategory Category { get; set; }
 
 
-        [ForeignKey("Department")]
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
 
@@ -35,7 +32,12 @@ namespace TicketingSys.Models
 
         public string Title { get; set; }
         
+        public TicketUrgencyEnum Urgency { get; set; }
 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+        public DateTime UpdatedAt { get; set; }
+
+        public string Description { get; set; }
     }
 }
