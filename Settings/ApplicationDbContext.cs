@@ -58,8 +58,7 @@ namespace TicketingSys.Settings
 
                 // Configure properties
                 entity.Property(r => r.Message).IsRequired();
-                entity.Property(r => r.CreatedAt)
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                
             });
 
 
