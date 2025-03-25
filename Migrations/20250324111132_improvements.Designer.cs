@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TicketingSys.Settings;
@@ -11,9 +12,11 @@ using TicketingSys.Settings;
 namespace TicketingSys.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250324111132_improvements")]
+    partial class improvements
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,23 +157,6 @@ namespace TicketingSys.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TicketingSys.Models.Department", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Departments");
-                });
-
             modelBuilder.Entity("TicketingSys.Models.Response", b =>
                 {
                     b.Property<int>("Id")
@@ -180,9 +166,7 @@ namespace TicketingSys.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -246,21 +230,10 @@ namespace TicketingSys.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AssignedToId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -273,19 +246,11 @@ namespace TicketingSys.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Urgency")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedToId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("SubmittedById");
 
@@ -301,11 +266,9 @@ namespace TicketingSys.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ContentType")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FileName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Path")
@@ -319,7 +282,7 @@ namespace TicketingSys.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketAttachments", (string)null);
+                    b.ToTable("TicketAttachments");
                 });
 
             modelBuilder.Entity("TicketingSys.Models.TicketCategory", b =>
@@ -331,7 +294,6 @@ namespace TicketingSys.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
@@ -352,7 +314,6 @@ namespace TicketingSys.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("AzureAdObjectId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -381,11 +342,9 @@ namespace TicketingSys.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.Property<string>("OauthRefreshToken")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("OauthToken")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
@@ -481,7 +440,7 @@ namespace TicketingSys.Migrations
                     b.HasOne("TicketingSys.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Ticket");
@@ -505,18 +464,11 @@ namespace TicketingSys.Migrations
                     b.HasOne("TicketingSys.Models.User", "AssignedTo")
                         .WithMany()
                         .HasForeignKey("AssignedToId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("TicketingSys.Models.TicketCategory", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
-
-                    b.HasOne("TicketingSys.Models.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -529,8 +481,6 @@ namespace TicketingSys.Migrations
                     b.Navigation("AssignedTo");
 
                     b.Navigation("Category");
-
-                    b.Navigation("Department");
 
                     b.Navigation("SubmittedBy");
                 });
