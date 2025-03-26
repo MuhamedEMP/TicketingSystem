@@ -2,6 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TicketingSys.Contracts.RepositoryInterfaces;
+using TicketingSys.Contracts.ServiceInterfaces;
+using TicketingSys.Dtos.TicketDtos;
+using TicketingSys.Mappers;
 using TicketingSys.Models;
 using TicketingSys.Settings;
 
@@ -11,12 +15,16 @@ namespace TicketingSys.Controllers
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
-
-        public UserController(ApplicationDbContext db)
+        private readonly IUserService _userService;
+        private readonly IAttachmentRepository _attachmentRepository;
+        public UserController(IUserService ticketService, IAttachmentRepository attachmentRepository, ApplicationDbContext db)
         {
+            _userService = ticketService;
+            _attachmentRepository = attachmentRepository;;
             _db = db;
         }
 
+        // not finalized yet but it works
         [HttpGet("register")]
         public async Task<IActionResult> registerUser()
         {
@@ -52,12 +60,46 @@ namespace TicketingSys.Controllers
             }
 
 
+        // testing endpoint
         [Authorize]
         [HttpGet("debug-claims")]
         public IActionResult DebugClaims()
         {
             var claims = User.Claims.Select(c => new { c.Type, c.Value });
             return Ok(claims);
+        }
+
+        [Authorize]
+        [HttpPost("newticket")]
+        public async Task<IActionResult> NewTicket([FromBody] NewTicketDto dto)
+        {
+            // sub is the user id
+            var userId = User.FindFirst("sub")?.Value
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var newTicket = dto.NewDtoToModel(userId);
+
+            Console.Write($"user id is : {userId}");
+
+            await _userService.newTicket(newTicket);
+
+            foreach (var attachmentDto in dto.Attachments)
+            {
+                var attachment = new TicketAttachment
+                {
+                    TicketId = newTicket.Id,  // Set the TicketId of the saved ticket
+                    Path = attachmentDto.Path,
+                    FileName = attachmentDto.Filename,
+                    ContentType = attachmentDto.ContentType
+                };
+
+                // Add each attachment to the ticket's attachment list (optional)
+                newTicket.Attachments.Add(attachment);
+            }
+
+            await _attachmentRepository.SaveAttachments(newTicket.Attachments);
+
+            return Ok(newTicket);
         }
     }
 }

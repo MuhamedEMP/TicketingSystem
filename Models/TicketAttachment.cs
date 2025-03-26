@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace TicketingSys.Models
 {
@@ -9,6 +10,7 @@ namespace TicketingSys.Models
         public int Id { get; set; }
 
         public int TicketId { get; set; }
+        [JsonIgnore]
         public Ticket Ticket { get; set; }
 
 

@@ -5,7 +5,11 @@ using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
+using TicketingSys.Contracts.RepositoryInterfaces;
+using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Models;
+using TicketingSys.Repository;
+using TicketingSys.Service;
 using TicketingSys.Settings;
 
 // this is so .net doesnt map jwt claims to long urls 
@@ -72,6 +76,11 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
 });
+
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 

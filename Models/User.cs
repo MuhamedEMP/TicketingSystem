@@ -12,7 +12,7 @@ namespace TicketingSys.Models
 
         public string email { get; set; }
 
-        public List<string> roles { get; set; }
+        public List<string> roles { get; set; } = new List<string>();
 
 
     }
