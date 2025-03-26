@@ -6,7 +6,7 @@ using TicketingSys.Models;
 
 namespace TicketingSys.Settings
 {
-    public class ApplicationDbContext : IdentityDbContext<User>
+    public class ApplicationDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Response> Responses { get; set; }
