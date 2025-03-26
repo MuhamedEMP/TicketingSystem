@@ -13,7 +13,7 @@ namespace TicketingSys.Models
         public User SubmittedBy { get; set; }
 
         // references the user a ticket is assigned to
-        public string AssignedToId { get; set; }
+        public string? AssignedToId { get; set; }
         public User? AssignedTo { get; set; }
 
         // no hard coded categories all will be saved in category table

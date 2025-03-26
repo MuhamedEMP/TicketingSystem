@@ -10,7 +10,7 @@ namespace TicketingSys.Models
         public int Id { get; set; }
 
         public int TicketId { get; set; }
-        [JsonIgnore]
+        [JsonIgnore] // to avoid circular object references
         public Ticket Ticket { get; set; }
 
 

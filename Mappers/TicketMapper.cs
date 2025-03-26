@@ -23,5 +23,32 @@ namespace TicketingSys.Mappers
                 Attachments = new List<TicketAttachment>()
             };
         }
+
+
+        public static ViewTicketDto modelToViewDto(this Ticket ticket)
+        {
+            return new ViewTicketDto
+            {
+                Id = ticket.Id,
+                Title = ticket.Title,
+                Description = ticket.Description,
+                Status = ticket.Status.ToString(),
+                Urgency = ticket.Urgency.ToString(),
+                SubmittedById = ticket.SubmittedById,
+                SubmittedByName = ticket.SubmittedBy.fullName,
+                AssignedToId = ticket.AssignedToId,
+                AssignedToName = ticket.AssignedTo?.fullName ?? "Unassigned",
+                DepartmentName = ticket.Department.Name,
+                CategoryName = ticket.Category.Name,
+                CreatedAt = ticket.CreatedAt,
+                UpdatedAt = ticket.UpdatedAt,
+                AttachmentPaths = ticket.Attachments?.Select(a => a.Path).ToList() ?? new List<string>()
+            };
+        }
+
+        public static List<ViewTicketDto> modelToViewDtoList(this List<Ticket> tickets)
+        {
+            return tickets.Select(t => t.modelToViewDto()).ToList();
+        }
     }
 }

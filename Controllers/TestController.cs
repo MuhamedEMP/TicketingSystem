@@ -15,13 +15,23 @@ namespace TicketingSys.Controllers
             return Ok(new { message = "This is a public endpoint. No authentication required." });
         }
 
+        [HttpGet("claims")]
+        public IActionResult GetClaims()
+        {
+            return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
+        }
 
         [Authorize(Policy = "ManagerOnly")]
-        [HttpGet("protected")]
+        [HttpGet("manageronly")]
         public IActionResult ProtectedEndpoint()
         {
-            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            return Ok(new { message = $"This is a MANAGER ONLY ENDPOINT. your role is {role}!" });
+            var roles = User.FindAll("roles").Concat(User.FindAll("role"))
+            .Select(r => r.Value)
+            .Distinct();
+
+            var roleList = string.Join(", ", roles);
+
+            return Ok(new { message = $"This is a MANAGER ONLY ENDPOINT. Your roles are: {roleList}" });
         }
 
         [Authorize(Policy ="AdminOnly")]

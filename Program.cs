@@ -66,15 +66,15 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ManagerOnly", policy => policy.RequireRole("manager"));
-});
 
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
+    options.AddPolicy("ManagerOnly", policy =>
+        policy.RequireClaim("roles", "manager"));
+
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("roles", "admin"));
 });
 
 

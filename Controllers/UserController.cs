@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Security.Claims;
 using TicketingSys.Contracts.RepositoryInterfaces;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.TicketDtos;
+using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
 using TicketingSys.Settings;
@@ -14,60 +16,17 @@ namespace TicketingSys.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
         private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
         private readonly IAttachmentRepository _attachmentRepository;
-        public UserController(IUserService ticketService, IAttachmentRepository attachmentRepository, ApplicationDbContext db)
+        public UserController(IUserService ticketService, IAttachmentRepository attachmentRepository,
+                              IUserRepository userRepository)
         {
             _userService = ticketService;
-            _attachmentRepository = attachmentRepository;;
-            _db = db;
+            _attachmentRepository = attachmentRepository;
+            _userRepository = userRepository;
         }
 
-        // not finalized yet but it works
-        [HttpGet("register")]
-        public async Task<IActionResult> registerUser()
-        {
-            // sub is the user id
-            var sub = User.FindFirst("sub")?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var email = User.FindFirst("unique_name")?.Value
-                      ?? User.FindFirst(ClaimTypes.Email)?.Value;
-
-            // list of roles the user has
-            var roles = User.FindAll("roles").Concat(User.FindAll("role"))
-                .Select(r => r.Value)
-                .Distinct()
-                .ToList();
-
-
-            var firstName = User.FindFirst("given_name")?.Value;
-            var lastName = User.FindFirst("family_name")?.Value;
-            var fullName = User.FindFirst("name")?.Value;
-
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.userId == sub);
-            if (user == null)
-            {
-                user = new User { userId = sub, email = email,
-                    firstName = firstName, lastName = lastName, fullName = fullName, roles = roles};
-                _db.Users.Add(user);
-                await _db.SaveChangesAsync();
-                return Ok("USER CREATED");
-            }
-
-            return Ok($"User EXISTS WITH details :sub-{sub} email-{email} fn-{firstName} ln-{lastName} full-{fullName}, roles {roles}");
-            }
-
-
-        // testing endpoint
-        [Authorize]
-        [HttpGet("debug-claims")]
-        public IActionResult DebugClaims()
-        {
-            var claims = User.Claims.Select(c => new { c.Type, c.Value });
-            return Ok(claims);
-        }
 
         [Authorize]
         [HttpPost("newticket")]
@@ -78,8 +37,6 @@ namespace TicketingSys.Controllers
             ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             var newTicket = dto.NewDtoToModel(userId);
-
-            Console.Write($"user id is : {userId}");
 
             await _userService.newTicket(newTicket);
 
@@ -100,6 +57,61 @@ namespace TicketingSys.Controllers
             await _attachmentRepository.SaveAttachments(newTicket.Attachments);
 
             return Ok(newTicket);
+        }
+
+        [Authorize]
+        [HttpGet("myprofile")]
+        public async Task<ActionResult<ViewUserDto>>  myProfile()
+        {
+            // sub is the user id
+            var userId = User.FindFirst("sub")?.Value
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var user = await _userRepository.getUserById(userId);
+
+            if (user is null)
+            {
+                return NotFound(new { message = "User profile not found." });
+            }
+
+            return user.userModelToDto();
+        }
+
+        [Authorize]
+        [HttpGet("tickets/{ticketId}")]
+        public async Task<ActionResult<ViewTicketDto>> GetMyTicketById(int ticketId)
+        {
+            // sub is the user id
+            var userId = User.FindFirst("sub")?.Value
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var ticket = await _userRepository.getTicketByUserIdAndTicketId(userId, ticketId);
+
+            if (ticket is null)
+            {
+                return NotFound($"Ticket with id {ticketId} not found");
+            }
+
+            return ticket.modelToViewDto();
+        }
+
+
+        [Authorize]
+        [HttpGet("mytickets")]
+        public async Task<ActionResult<List<ViewTicketDto>>> GetAllMyTickets()
+        {
+            // sub is the user id
+            var userId = User.FindFirst("sub")?.Value
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var tickets = await _userRepository.getAllTicketByUserId(userId);
+
+            if (!tickets.Any())
+            {
+                return NotFound("You have no tickets");
+            }
+
+            return tickets.modelToViewDtoList();
         }
     }
 }
