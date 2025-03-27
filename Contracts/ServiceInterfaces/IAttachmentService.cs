@@ -1,8 +1,8 @@
 ﻿using TicketingSys.Models;
 
-namespace TicketingSys.Contracts.RepositoryInterfaces
+namespace TicketingSys.Contracts.ServiceInterfaces
 {
-    public interface IAttachmentRepository
+    public interface IAttachmentService
     {
         Task SaveAttachments(List<TicketAttachment> attachments);
     }
