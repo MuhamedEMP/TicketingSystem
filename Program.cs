@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
-using TicketingSys.Contracts.RepositoryInterfaces;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Models;
-using TicketingSys.Repository;
+using TicketingSys.RoleUtils;
 using TicketingSys.Service;
 using TicketingSys.Settings;
 
@@ -70,18 +70,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
+    // jwt claim based policies
     options.AddPolicy("ManagerOnly", policy =>
         policy.RequireClaim("roles", "manager"));
 
     options.AddPolicy("AdminOnly", policy =>
         policy.RequireClaim("roles", "admin"));
 
+    // policies which check role from db
+    options.AddPolicy("TestPolicy", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("test")));
+
+    options.AddPolicy("AdminFromDb", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("admin")));
 });
 
 
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+// for custom role policies
+builder.Services.AddScoped<IAuthorizationHandler, RoleInDbHandler>();
 
 
 

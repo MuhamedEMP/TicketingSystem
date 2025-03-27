@@ -1,14 +1,15 @@
-﻿using TicketingSys.Contracts.RepositoryInterfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Models;
 using TicketingSys.Settings;
 
-namespace TicketingSys.Repository
+namespace TicketingSys.Service
 {
-    public class AttachmentRepository : IAttachmentRepository
+    public class AttachmentService : IAttachmentService
     {
         private readonly ApplicationDbContext _context;
 
-        public AttachmentRepository(ApplicationDbContext context)
+        public AttachmentService(ApplicationDbContext context)
         {
             _context = context;
         }

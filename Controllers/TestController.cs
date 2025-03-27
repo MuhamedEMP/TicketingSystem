@@ -35,14 +35,14 @@ namespace TicketingSys.Controllers
             return Ok(new { message = $"This is a MANAGER ONLY ENDPOINT. Your roles are: {roleList}" });
         }
 
-        [Authorize(Policy ="AdminOnly")]
+        [Authorize(Policy ="TestPolicy")]
         [HttpGet("profile")]
         public IActionResult GetProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // 'sub' claim
             var userEmail = User.FindFirstValue(ClaimTypes.Email); // 'email' claim
             var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            return Ok(new { message = $"This is ADMIN ONLY ENDPOINT. your role is {role}!" });
+            return Ok(new { message = $"This is ADMIN ONLY ENDPOINT. your role from JWT is {role}!" });
         }
 
     }

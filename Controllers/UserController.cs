@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Security.Claims;
-using TicketingSys.Contracts.RepositoryInterfaces;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
@@ -17,14 +16,14 @@ namespace TicketingSys.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IUserRepository _userRepository;
-        private readonly IAttachmentRepository _attachmentRepository;
-        public UserController(IUserService ticketService, IAttachmentRepository attachmentRepository,
-                              IUserRepository userRepository)
+        private readonly IAttachmentService _attachmentService;
+        private readonly IAdminService _adminService;
+        public UserController(IUserService ticketService, IAttachmentService attachmentService,
+                              IUserService userService)
         {
             _userService = ticketService;
-            _attachmentRepository = attachmentRepository;
-            _userRepository = userRepository;
+            _attachmentService = attachmentService;
+            _userService = userService;
         }
 
 
@@ -38,7 +37,7 @@ namespace TicketingSys.Controllers
 
             var newTicket = dto.NewDtoToModel(userId);
 
-            await _userService.newTicket(newTicket);
+            await _userService.addNewTicket(newTicket);
 
             foreach (var attachmentDto in dto.Attachments)
             {
@@ -54,7 +53,7 @@ namespace TicketingSys.Controllers
                 newTicket.Attachments.Add(attachment);
             }
 
-            await _attachmentRepository.SaveAttachments(newTicket.Attachments);
+            await _attachmentService.SaveAttachments(newTicket.Attachments);
 
             return Ok(newTicket);
         }
@@ -67,7 +66,7 @@ namespace TicketingSys.Controllers
             var userId = User.FindFirst("sub")?.Value
             ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var user = await _userRepository.getUserById(userId);
+            var user = await _userService.getUserById(userId);
 
             if (user is null)
             {
@@ -85,7 +84,7 @@ namespace TicketingSys.Controllers
             var userId = User.FindFirst("sub")?.Value
             ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var ticket = await _userRepository.getTicketByUserIdAndTicketId(userId, ticketId);
+            var ticket = await _userService.getTicketByUserIdAndTicketId(userId, ticketId);
 
             if (ticket is null)
             {
@@ -104,7 +103,7 @@ namespace TicketingSys.Controllers
             var userId = User.FindFirst("sub")?.Value
             ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var tickets = await _userRepository.getAllTicketByUserId(userId);
+            var tickets = await _userService.getAllTicketByUserId(userId);
 
             if (!tickets.Any())
             {
