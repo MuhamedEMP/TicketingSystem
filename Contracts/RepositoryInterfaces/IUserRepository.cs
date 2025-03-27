@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Models;
 namespace TicketingSys.Contracts.RepositoryInterfaces
 {
@@ -11,6 +12,8 @@ namespace TicketingSys.Contracts.RepositoryInterfaces
         Task<Ticket?> getTicketByUserIdAndTicketId(string userId, int ticketId);
 
         Task<List<Ticket>?> getAllTicketByUserId(string userId);
+
+        Task<List<Ticket>?> filterTickets(string userId, TicketQueryParamsDto filters);
     }
 
 }

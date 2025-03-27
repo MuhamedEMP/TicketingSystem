@@ -113,5 +113,24 @@ namespace TicketingSys.Controllers
 
             return tickets.modelToViewDtoList();
         }
+
+
+        [Authorize]
+        [HttpGet("filter")]
+        public async Task<ActionResult<List<ViewTicketDto>>> FilterMyTickets([FromQuery] TicketQueryParamsDto queryDto)
+        {
+            // sub is the user id
+            var userId = User.FindFirst("sub")?.Value
+            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var results = await _userService.filterTickets(userId, queryDto);
+
+            if(!results.Any())
+            {
+                return NotFound("No tickets found");
+            }
+
+            return Ok(results);
+        }
     }
 }

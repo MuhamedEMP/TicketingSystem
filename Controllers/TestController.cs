@@ -15,6 +15,7 @@ namespace TicketingSys.Controllers
             return Ok(new { message = "This is a public endpoint. No authentication required." });
         }
 
+        [Authorize]
         [HttpGet("claims")]
         public IActionResult GetClaims()
         {
@@ -43,5 +44,6 @@ namespace TicketingSys.Controllers
             var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
             return Ok(new { message = $"This is ADMIN ONLY ENDPOINT. your role is {role}!" });
         }
+
     }
 }

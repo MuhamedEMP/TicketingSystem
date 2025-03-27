@@ -47,6 +47,8 @@ namespace TicketingSys.Controllers
                 .Distinct()
                 .ToList();
 
+            if (roles.Count == 0) roles.Add("user");
+
 
             var firstName = User.FindFirst("given_name")?.Value;
             var lastName = User.FindFirst("family_name")?.Value;
@@ -71,7 +73,5 @@ namespace TicketingSys.Controllers
 
             return Ok($"User EXISTS WITH details :sub-{sub} email-{email} fn-{firstName} ln-{lastName} full-{fullName}, roles {roles}");
         }
-
-
     }
 }
