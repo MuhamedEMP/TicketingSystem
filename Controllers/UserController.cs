@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Security.Claims;
+using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
-using TicketingSys.Settings;
+using TicketingSys.Util;
 
 namespace TicketingSys.Controllers
 {
@@ -18,12 +17,14 @@ namespace TicketingSys.Controllers
         private readonly IUserService _userService;
         private readonly IAttachmentService _attachmentService;
         private readonly IAdminService _adminService;
+        private readonly IUserUtils _userUtils;
         public UserController(IUserService ticketService, IAttachmentService attachmentService,
-                              IUserService userService)
+                              IUserService userService, IUserUtils userUtils)
         {
             _userService = ticketService;
             _attachmentService = attachmentService;
             _userService = userService;
+            _userUtils = userUtils;
         }
 
 
@@ -31,9 +32,7 @@ namespace TicketingSys.Controllers
         [HttpPost("newticket")]
         public async Task<IActionResult> NewTicket([FromBody] NewTicketDto dto)
         {
-            // sub is the user id
-            var userId = User.FindFirst("sub")?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userUtils.getUserId();
 
             var newTicket = dto.NewDtoToModel(userId);
 
@@ -62,9 +61,7 @@ namespace TicketingSys.Controllers
         [HttpGet("myprofile")]
         public async Task<ActionResult<ViewUserDto>>  myProfile()
         {
-            // sub is the user id
-            var userId = User.FindFirst("sub")?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userUtils.getUserId();
 
             var user = await _userService.getUserById(userId);
 
@@ -80,9 +77,7 @@ namespace TicketingSys.Controllers
         [HttpGet("tickets/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto>> GetMyTicketById(int ticketId)
         {
-            // sub is the user id
-            var userId = User.FindFirst("sub")?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userUtils.getUserId();
 
             var ticket = await _userService.getTicketByUserIdAndTicketId(userId, ticketId);
 
@@ -99,9 +94,7 @@ namespace TicketingSys.Controllers
         [HttpGet("mytickets")]
         public async Task<ActionResult<List<ViewTicketDto>>> GetAllMyTickets()
         {
-            // sub is the user id
-            var userId = User.FindFirst("sub")?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userUtils.getUserId();
 
             var tickets = await _userService.getAllTicketByUserId(userId);
 
@@ -118,9 +111,7 @@ namespace TicketingSys.Controllers
         [HttpGet("filter")]
         public async Task<ActionResult<List<ViewTicketDto>>> FilterMyTickets([FromQuery] TicketQueryParamsDto queryDto)
         {
-            // sub is the user id
-            var userId = User.FindFirst("sub")?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _userUtils.getUserId();
 
             var results = await _userService.filterTickets(userId, queryDto);
 

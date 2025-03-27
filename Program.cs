@@ -6,11 +6,13 @@ using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
+using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Models;
 using TicketingSys.RoleUtils;
 using TicketingSys.Service;
 using TicketingSys.Settings;
+using TicketingSys.Util;
 
 // this is so .net doesnt map jwt claims to long urls 
 Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -89,6 +91,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IUserUtils, UserUtils>();
 // for custom role policies
 builder.Services.AddScoped<IAuthorizationHandler, RoleInDbHandler>();
 
