@@ -80,11 +80,17 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("roles", "admin"));
 
     // policies which check role from db
-    options.AddPolicy("TestPolicy", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("test")));
-
     options.AddPolicy("AdminFromDb", policy =>
         policy.Requirements.Add(new RoleInDbRequirement("admin")));
+
+     options.AddPolicy("HrFromDb", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("hr")));
+
+     options.AddPolicy("ItFromDb", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("it")));
+
+    options.AddPolicy("UserFromDb", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("user")));
 });
 
 
