@@ -35,9 +35,14 @@ namespace TicketingSys.Settings
             modelBuilder.Entity<Department>(entity =>
             {
                 entity.HasKey(d => d.Id);
-                // setting name as required
+
+                // Required name
                 entity.Property(d => d.Name).IsRequired();
+
+                // Unique index on name (case-sensitive)
+                entity.HasIndex(d => d.Name).IsUnique();
             });
+
 
             // Response
             modelBuilder.Entity<Response>(entity =>
@@ -136,6 +141,8 @@ namespace TicketingSys.Settings
                     entity.HasKey(tc => tc.Id);
                     // Mark Name as required
                     entity.Property(tc => tc.Name).IsRequired();
+
+                    entity.HasIndex(tc => tc.Name).IsUnique();
                 });
             });
             

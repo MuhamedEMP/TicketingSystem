@@ -91,12 +91,32 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("UserFromDb", policy =>
         policy.Requirements.Add(new RoleInDbRequirement("user")));
+
+    // combined policies
+    options.AddPolicy("AdminHrItFromDb", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("admin", "hr", "it")));
+
+    options.AddPolicy("HrOrIt", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("hr", "it")));
+
+    options.AddPolicy("HrOrAdmin", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("hr", "admin")));
+
+    options.AddPolicy("ItOrAdmin", policy =>
+       policy.Requirements.Add(new RoleInDbRequirement("it", "admin")));
+
+    options.AddPolicy("HrOrIT", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("hr", "it")));
+
+    options.AddPolicy("AllRoles", policy =>
+        policy.Requirements.Add(new RoleInDbRequirement("hr", "it","admin", "user")));
 });
 
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ISharedService, SharedService>();
 builder.Services.AddScoped<IUserUtils, UserUtils>();
 // for custom role policies
 builder.Services.AddScoped<IAuthorizationHandler, RoleInDbHandler>();

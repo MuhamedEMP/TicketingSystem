@@ -4,12 +4,12 @@ namespace TicketingSys.RoleUtils
 {
     public class RoleInDbRequirement : IAuthorizationRequirement
     {
-    
-        public string requiredRole {  get; set; }
 
-        public RoleInDbRequirement(string role)
+        public List<string> RequiredRoles { get; }
+
+        public RoleInDbRequirement(params string[] roles)
         {
-            requiredRole = role;
+            RequiredRoles = roles.Select(r => r.ToLowerInvariant()).ToList();
         }
     }
 }

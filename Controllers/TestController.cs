@@ -17,14 +17,14 @@ namespace TicketingSys.Controllers
             return Ok(claims);
         }
 
-        // Public Endpoint (No Authentication Required)
+
+        [Authorize(Policy ="AdminFromDb")]
         [HttpGet("public")]
         public IActionResult PublicEndpoint()
         {
             return Ok(new { message = "This is a public endpoint. No authentication required." });
         }
 
-        [Authorize]
         [HttpGet("claims")]
         public IActionResult GetClaims()
         {
@@ -43,6 +43,34 @@ namespace TicketingSys.Controllers
 
             return Ok(new { message = $"This is a MANAGER ONLY ENDPOINT. Your roles are: {roleList}" });
         }
+
+
+        [Authorize(Policy = "HrOrIt")]
+        [HttpGet("hrorit")]
+        public IActionResult ProtectedEndpointdasd()
+        {
+            var roles = User.FindAll("roles").Concat(User.FindAll("role"))
+            .Select(r => r.Value)
+            .Distinct();
+
+            var roleList = string.Join(", ", roles);
+
+            return Ok(new { message = $"This is a HR OR IT ONLY ENDPOINT. Your roles are: {roleList}" });
+        }
+
+        [Authorize(Policy = "ItOrAdmin")]
+        [HttpGet("itoradmin")]
+        public IActionResult ProtectedEd()
+        {
+            var roles = User.FindAll("roles").Concat(User.FindAll("role"))
+            .Select(r => r.Value)
+            .Distinct();
+
+            var roleList = string.Join(", ", roles);
+
+            return Ok(new { message = $"This is a HR OR IT ONLY ENDPOINT. Your roles are: {roleList}" });
+        }
+
 
         [Authorize(Policy ="TestPolicy")]
         [HttpGet("profile")]

@@ -72,22 +72,6 @@ namespace TicketingSys.Controllers
 
 
         [Authorize]
-        [HttpGet("myprofile")]
-        public async Task<ActionResult<ViewUserDto>>  myProfile()
-        {
-            var userId = _userUtils.getUserId();
-
-            var user = await _userService.getUserById(userId);
-
-            if (user is null)
-            {
-                return NotFound(new { message = "User profile not found." });
-            }
-
-            return user.userModelToDto();
-        }
-
-        [Authorize]
         [HttpGet("tickets/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto>> GetMyTicketById(int ticketId)
         {

@@ -15,16 +15,21 @@ namespace TicketingSys.RoleUtils
         }
 
         protected override async Task HandleRequirementAsync(
-        AuthorizationHandlerContext context,
-        RoleInDbRequirement requirement)
+            AuthorizationHandlerContext context,
+            RoleInDbRequirement requirement)
         {
             var sub = context.User.FindFirst("sub")?.Value;
 
             if (string.IsNullOrEmpty(sub))
-                throw new Exception("NO SUB IN JWT");
+                return;
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.userId == sub);
-            if (user != null && user.roles.Contains(requirement.requiredRole))
+            if (user == null)
+                return;
+
+            var userRoles = user.roles.Select(r => r.ToLowerInvariant());
+
+            if (userRoles.Any(role => requirement.RequiredRoles.Contains(role)))
             {
                 context.Succeed(requirement);
             }
