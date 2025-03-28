@@ -20,15 +20,6 @@ namespace TicketingSys.Controllers
             
         }
 
-        // testing endpoint
-        [Authorize]
-        [HttpGet("debug-claims")]
-        public IActionResult DebugClaims()
-        {
-            var claims = User.Claims.Select(c => new { c.Type, c.Value });
-            return Ok(claims);
-        }
-
 
         // not finalized yet but it works
         [HttpGet("register")]

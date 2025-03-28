@@ -8,6 +8,15 @@ namespace TicketingSys.Controllers
     [ApiController]
     public class TestController: ControllerBase
     {
+        // testing endpoint
+        [Authorize]
+        [HttpGet("debug-claims")]
+        public IActionResult DebugClaims()
+        {
+            var claims = User.Claims.Select(c => new { c.Type, c.Value });
+            return Ok(claims);
+        }
+
         // Public Endpoint (No Authentication Required)
         [HttpGet("public")]
         public IActionResult PublicEndpoint()

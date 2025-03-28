@@ -12,12 +12,12 @@ namespace TicketingSys.Util
             {
                 _httpContextAccessor = httpContextAccessor;
             }
+
             public string? getUserId()
             { // sub is the user id
                 var user = _httpContextAccessor.HttpContext?.User;
                 return user?.FindFirst("sub")?.Value
                     ?? user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             }
         }
 

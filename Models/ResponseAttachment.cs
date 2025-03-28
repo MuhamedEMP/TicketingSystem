@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace TicketingSys.Models
 {
@@ -9,6 +10,7 @@ namespace TicketingSys.Models
         public int Id { get; set; }
 
         public int ResponseId { get; set; }
+        [JsonIgnore] // to avoid circular object references
         public Response Response { get; set; }
 
         public string Path { get; set; }

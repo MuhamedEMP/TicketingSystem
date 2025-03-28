@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
+using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Models;
 
 namespace TicketingSys.Contracts.ServiceInterfaces
@@ -15,5 +17,17 @@ namespace TicketingSys.Contracts.ServiceInterfaces
         Task<List<Ticket>?> getAllTicketByUserId(string userId);
 
         Task<List<ViewTicketDto>?> filterTickets(string userId, TicketQueryParamsDto filters);
+
+        Task<Response> AddResponse(NewResponseDto dto, string userId);
+
+        Task<Ticket?> getTikcketById(int ticketId);
+
+        Task<List<ViewResponseDto>> getResponsesToUserTickets(string userId);
+
+        Task<List<ViewResponseDto>> getResponsesSentByUser(string userId);
+
+        Task<ViewResponseDto?> getSentResponseByUserIdAndResponseId(string userId, int responseId);
+
+        Task<ViewResponseDto?> GetResponseToMyTicketById(string userId, int responseId);
     }
 }

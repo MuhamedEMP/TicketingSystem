@@ -8,6 +8,5 @@ namespace TicketingSys.Models
 
         public string Name { get; set; }
 
-
     }
 }
