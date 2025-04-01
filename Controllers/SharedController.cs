@@ -3,25 +3,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
+using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
+using TicketingSys.Enums;
 using TicketingSys.Mappers;
+using TicketingSys.Models;
 using TicketingSys.Service;
 
 namespace TicketingSys.Controllers
 {   
-    // routes that can be used by multiple user roles are here
+    // routes that can be used by multiple user roles are here (admin, hr and it)
 
     [ApiController]
     public class SharedController : ControllerBase
     {
         private readonly ISharedService _sharedService;
         private readonly IUserUtils _userUtils;
+        private readonly IAttachmentService _attachmentService;
 
-        public SharedController(ISharedService sharedService, IUserUtils userUtils)
+        public SharedController(ISharedService sharedService, IUserUtils userUtils, IAttachmentService attachmentService)
         {
             _sharedService = sharedService;
             _userUtils = userUtils;
+            _attachmentService = attachmentService;
         }
 
         [Authorize(Policy ="AllRoles")]
@@ -91,13 +96,7 @@ namespace TicketingSys.Controllers
         [HttpGet("ticket/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto?>> getTicketById(int ticketId)
         {
-            var userId = _userUtils.getUserId();
-
-            var user = await _sharedService.getUserById(userId);
-
-            var normalizedRoles = user.roles
-                .Select(role => role.ToLowerInvariant())
-                .ToList();
+            var currentUserRoles = await _userUtils.getUserRoles();
 
             var ticket = await _sharedService.getTicketById(ticketId);
 
@@ -106,8 +105,8 @@ namespace TicketingSys.Controllers
 
             var ticketDept = ticket.Department.Name.ToLowerInvariant();
 
-            bool isAdmin = normalizedRoles.Contains("admin");
-            bool isInSameDept = ticketDept != null && normalizedRoles.Contains(ticketDept);
+            bool isAdmin = currentUserRoles.Contains("admin");
+            bool isInSameDept = ticketDept != null && currentUserRoles.Contains(ticketDept);
 
             if (!isAdmin && !isInSameDept)
                 return Forbid();
@@ -116,6 +115,112 @@ namespace TicketingSys.Controllers
         }
 
 
+        // returns all tickets submitted by a user, according to the roles of the currently logged in user
+        [Authorize("AdminHrItFromDb")]
+        [HttpGet("alltickets/{userId}")]
+        public async Task<ActionResult<List<ViewTicketDto>>> getAllUsersTickets(string userId)
+        {
+            var currentUserRoles = await _userUtils.getUserRoles();
 
+            if (currentUserRoles == null || currentUserRoles.Count == 0)
+                return Forbid();
+
+            var tickets = await _sharedService.getAllTicketsFromUserByDepartment(userId, currentUserRoles);
+
+            if (tickets == null || !tickets.Any())
+                return NotFound("This user has no tickets");
+
+            return Ok(tickets);
+        }
+
+
+        [Authorize(Policy = "HrOrIt")]
+        [HttpPatch("ticketstatus/{ticketId}")]
+        public async Task<ActionResult<ViewTicketDto?>> changeTicketStatus(int ticketId, [FromBody] ChangeTicketStatusDto status)
+        {
+            var currentUserRoles = await _userUtils.getUserRoles();
+
+            if (currentUserRoles == null || currentUserRoles.Count == 0)
+                return Forbid();
+
+            var ticket = await _sharedService.changeTicketStatus(ticketId, status.Status, currentUserRoles);
+
+            if (ticket == null) return NotFound();
+
+            return Ok(ticket);
+        }
+
+        [Authorize(Policy = "HrOrIt")]
+        [HttpPatch("assigntome/{ticketId}")]
+        public async Task<ActionResult<ViewTicketDto?>> assignTicketToMe(int ticketId)
+        {
+            var currentUserRoles = await _userUtils.getUserRoles();
+            var currentUserId = _userUtils.getUserId(); 
+
+            if (string.IsNullOrEmpty(currentUserId) || currentUserRoles == null || currentUserRoles.Count == 0)
+                return Forbid();
+
+            var ticket = await _sharedService.assignTicketToUser(ticketId, currentUserId, currentUserRoles);
+
+            if (ticket == null) return NotFound();
+
+            return Ok(ticket);
+        }
+
+        // send response for a ticket
+        [Authorize(Policy = "HrOrIt")]
+        [HttpPost("response")] 
+        public async Task<IActionResult> AddResponse([FromBody] NewResponseDto dto)
+        {
+            var userId =_userUtils.getUserId();
+            var CurrentUserRoles = await _userUtils.getUserRoles();
+
+            var referencedTicket = await _sharedService.getTicketById(dto.TicketId);
+
+            if (referencedTicket is null) return BadRequest("Invalid ticket id");
+
+            var savedResponse = await _sharedService.AddResponse(dto, userId, CurrentUserRoles);
+
+            if (dto.Attachments != null && dto.Attachments.Any())
+            {
+                var attachments = await _attachmentService.CreateAndSaveResponseAttachments(savedResponse.Id, dto.Attachments);
+                savedResponse.Attachments = attachments;
+            }
+
+            return Ok(savedResponse.ToViewDto());
+        }
+
+
+
+        // get all responses i sent - HR and IT only
+        [Authorize(Policy = "HrOrIt")]
+        [HttpGet("sentresponses")]
+        public async Task<ActionResult<List<ViewResponseDto>>> getSentResponses()
+        {
+            var userId = _userUtils.getUserId();
+
+            var results = await _sharedService.getResponsesSentByUser(userId);
+
+            if (results is null || results.Count == 0)
+                return NotFound("You have no sent  responses");
+
+            return Ok(results);
+        }
+
+
+        // should return response the hr or it user sent but double check if it works properly
+        [Authorize(Policy = "HrOrIt")]
+        [HttpGet("sentresponse/{responseId}")]
+        public async Task<ActionResult<ViewResponseDto?>> getSentResponse(int responseId)
+        {
+
+            var userId = _userUtils.getUserId();
+
+            var response = await _sharedService.getSentResponseByUserIdAndResponseId(userId, responseId);
+
+            if (response is null) return NotFound("You did not send a response with this id");
+
+            return Ok(response);
+        }
     }
 }

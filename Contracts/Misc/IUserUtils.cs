@@ -3,5 +3,7 @@
     public interface IUserUtils
     {
         string? getUserId();
+
+        Task<List<string>?> getUserRoles();
     }
 }

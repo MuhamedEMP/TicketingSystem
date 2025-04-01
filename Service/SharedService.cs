@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Data;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
+using TicketingSys.Enums;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
 using TicketingSys.Settings;
@@ -19,7 +21,7 @@ namespace TicketingSys.Service
             _context = context;
         }
 
-        public async Task<Response> AddResponse(NewResponseDto dto, string userId)
+        public async Task<Response?> AddResponse(NewResponseDto dto, string userId, List<string> currentUserRoles)
         {
             var response = new Response
             {
@@ -34,6 +36,13 @@ namespace TicketingSys.Service
             await _context.Responses.AddAsync(response);
 
             var referencedTicket = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == dto.TicketId);
+            var departmentName = referencedTicket.Department.Name.ToLower();
+
+            var userHasAccess = currentUserRoles
+                .Any(role => role.Equals(departmentName, StringComparison.OrdinalIgnoreCase));
+
+            if (!userHasAccess)
+                return null;
 
             if (referencedTicket.Status != dto.Status)
                 referencedTicket.Status = dto.Status;
@@ -197,5 +206,91 @@ namespace TicketingSys.Service
             if (user == null) return null;
             return user.userModelToDto();
         }
+
+        public async Task<List<ViewTicketDto>?> getAllTicketsFromUserByDepartment(string userId, List<string> currentUserRoles)
+        {
+            if (currentUserRoles.Contains("admin"))
+            {
+                var allTickets = await _context.Tickets
+                    .Include(t => t.SubmittedBy)
+                    .Include(t => t.AssignedTo)
+                    .Include(t => t.Category)
+                    .Include(t => t.Department)
+                    .Include(t => t.Attachments)
+                    .Where(t => t.SubmittedById == userId)
+                    .ToListAsync();
+
+                return allTickets.modelToViewDtoList();
+            }
+
+
+            var tickets = await _context.Tickets
+                .Include(t => t.SubmittedBy)
+                .Include(t => t.AssignedTo)
+                .Include(t => t.Category)
+                .Include(t => t.Department)
+                .Include(t => t.Attachments)
+                .Where(t =>
+                    t.SubmittedById == userId &&
+                    currentUserRoles.Contains(t.Department.Name.ToLower()))
+                .ToListAsync();
+
+
+            if (tickets.Any()) return tickets.modelToViewDtoList();
+            return null;
+        }
+
+        public async Task<ViewTicketDto?> changeTicketStatus(int ticketId, TicketStatusEnum status, List<string> currentUserRoles)
+        {
+            // include object references
+            var ticket = await _context.Tickets
+            .Include(t => t.Department)
+            .Include(t => t.SubmittedBy)
+            .Include(t => t.AssignedTo)
+            .Include(t => t.Category)
+            .Include(t => t.Attachments)
+            .FirstOrDefaultAsync(t => t.Id == ticketId);
+
+            if (ticket == null) return null;
+
+            var departmentName = ticket.Department.Name.ToLower();
+            var userHasAccess = currentUserRoles
+                .Any(role => role.Equals(departmentName, StringComparison.OrdinalIgnoreCase) || role.Equals("admin", StringComparison.OrdinalIgnoreCase));
+
+            if (!userHasAccess) return null;
+
+            ticket.Status = status;
+            ticket.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return ticket.modelToViewDto();
+        }
+
+        public async Task<ViewTicketDto?> assignTicketToUser(int ticketId, string userId, List<string> currentUserRoles)
+        {
+            // include object references
+            var ticket = await _context.Tickets
+            .Include(t => t.Department)
+            .Include(t => t.SubmittedBy)
+            .Include(t => t.AssignedTo)
+            .Include(t => t.Category)
+            .Include(t => t.Attachments)
+            .FirstOrDefaultAsync(t => t.Id == ticketId);
+
+            if (ticket == null) return null;
+
+            var departmentName = ticket.Department.Name.ToLower();
+            var userHasAccess = currentUserRoles
+                .Any(role => role.Equals(departmentName, StringComparison.OrdinalIgnoreCase) || role.Equals("admin", StringComparison.OrdinalIgnoreCase));
+
+            if (!userHasAccess) return null;
+
+            ticket.AssignedToId = userId;
+            ticket.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return ticket.modelToViewDto();
+        }
+
     }
 }
