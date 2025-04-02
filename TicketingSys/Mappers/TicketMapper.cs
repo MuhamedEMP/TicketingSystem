@@ -24,7 +24,6 @@ namespace TicketingSys.Mappers
             };
         }
 
-
         public static ViewTicketDto modelToViewDto(this Ticket ticket)
         {
             return new ViewTicketDto
@@ -35,16 +34,17 @@ namespace TicketingSys.Mappers
                 Status = ticket.Status.ToString(),
                 Urgency = ticket.Urgency.ToString(),
                 SubmittedById = ticket.SubmittedById,
-                SubmittedByName = ticket.SubmittedBy.fullName,
+                SubmittedByName = ticket.SubmittedBy?.fullName ?? "Unknown",
                 AssignedToId = ticket.AssignedToId,
                 AssignedToName = ticket.AssignedTo?.fullName ?? "Unassigned",
-                DepartmentName = ticket.Department.Name,
-                CategoryName = ticket.Category.Name,
+                DepartmentName = ticket.Department?.Name ?? "Unknown", // problem
+                CategoryName = ticket.Category?.Name ?? "Unknown", // problem
                 CreatedAt = ticket.CreatedAt,
                 UpdatedAt = ticket.UpdatedAt,
                 AttachmentPaths = ticket.Attachments?.Select(a => a.Path).ToList() ?? new List<string>()
             };
         }
+
 
         public static List<ViewTicketDto> modelToViewDtoList(this List<Ticket> tickets)
         {

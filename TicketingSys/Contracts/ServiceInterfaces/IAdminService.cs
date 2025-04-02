@@ -15,8 +15,5 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task addCategory(NewTicketCategoryDto category);
 
-        Task<List<ViewTicketDto>?> getAllTickets();
-
-        Task<List<ViewTicketDto>?> filterAllTickets(TicketQueryParamsDto filters);
     }
 }

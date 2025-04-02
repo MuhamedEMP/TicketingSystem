@@ -8,6 +8,7 @@ using TicketingSys.Enums;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
 using TicketingSys.Settings;
+using TicketingSys.Utils;
 
 namespace TicketingSys.Service
 {
@@ -54,7 +55,7 @@ namespace TicketingSys.Service
 
         public async Task<List<Ticket>?> getAllTicketByUserId(string userId)
         {
-            return await _context.Tickets
+            var tickets = await _context.Tickets
             .Where(t => t.SubmittedById == userId)
             .Include(t => t.Category)
             .Include(t => t.Department)
@@ -62,6 +63,8 @@ namespace TicketingSys.Service
             .Include(t => t.SubmittedBy)
             .Include(t => t.Attachments)
             .ToListAsync();
+
+            return tickets.SortByStatusAndUrgency();
         }
 
         public async Task<List<ViewTicketDto>?> getAllTicketsFromMyDepartment(string userId)
@@ -82,8 +85,8 @@ namespace TicketingSys.Service
            .ToListAsync();
 
             if (tickets == null || tickets.Count == 0) return null;
-
-            return tickets.modelToViewDtoList();
+            var sorted = tickets.SortByStatusAndUrgency();
+            return sorted.modelToViewDtoList();
         }
 
 
@@ -143,7 +146,8 @@ namespace TicketingSys.Service
                 );
 
             var tickets = await queryable.ToListAsync();
-            return tickets.Any() ? tickets.modelToViewDtoList() : null;
+            var sorted = tickets.SortByStatusAndUrgency();
+            return sorted.Any() ? sorted.modelToViewDtoList() : null;
         }
 
 
@@ -151,12 +155,23 @@ namespace TicketingSys.Service
         {
             var responsesSentByUser = await _context.Responses
             .Include(r => r.Ticket)
+                .ThenInclude(t => t.Category)
+            .Include(r => r.Ticket)
+                .ThenInclude(t => t.Department)
+            .Include(r => r.Ticket)
+                .ThenInclude(t => t.AssignedTo)
+            .Include(r => r.Ticket)
+                .ThenInclude(t => t.SubmittedBy)
+            .Include(r => r.Ticket)
+                .ThenInclude(t => t.Attachments)
             .Include(r => r.User)
             .Include(r => r.Attachments)
             .Where(r => r.UserId == userId)
             .ToListAsync();
 
-            return responsesSentByUser.Select(r => r.ToViewDto()).ToList();
+            var sorted = responsesSentByUser.SortByTicketStatusAndUrgency();
+
+            return sorted.Select(r => r.ToViewDto()).ToList();
         }
 
         public async Task<ViewResponseDto?> getSentResponseByUserIdAndResponseId(string userId, int responseId)
@@ -219,8 +234,9 @@ namespace TicketingSys.Service
                     .Include(t => t.Attachments)
                     .Where(t => t.SubmittedById == userId)
                     .ToListAsync();
+                var sortedadmin = allTickets.SortByStatusAndUrgency();
 
-                return allTickets.modelToViewDtoList();
+                return sortedadmin.modelToViewDtoList();
             }
 
 
@@ -235,8 +251,9 @@ namespace TicketingSys.Service
                     currentUserRoles.Contains(t.Department.Name.ToLower()))
                 .ToListAsync();
 
+            var sorted = tickets.SortByStatusAndUrgency();
 
-            if (tickets.Any()) return tickets.modelToViewDtoList();
+            if (sorted.Any()) return sorted.modelToViewDtoList();
             return null;
         }
 

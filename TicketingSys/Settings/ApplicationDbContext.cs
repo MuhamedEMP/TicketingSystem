@@ -42,7 +42,7 @@ namespace TicketingSys.Settings
                 // Unique index on name (case-sensitive)
                 entity.HasIndex(d => d.Name).IsUnique();
             });
-
+            
 
             // Response
             modelBuilder.Entity<Response>(entity =>

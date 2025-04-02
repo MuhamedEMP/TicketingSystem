@@ -67,14 +67,5 @@ namespace TicketingSys.Service
             await _context.SaveChangesAsync();
         }
 
-        public Task<List<ViewTicketDto>?> getAllTickets()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<ViewTicketDto>?> filterAllTickets(TicketQueryParamsDto filters)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

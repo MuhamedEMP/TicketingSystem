@@ -20,7 +20,7 @@ namespace TicketingSys.Models
         public int CategoryId { get; set; }
         public TicketCategory Category { get; set; }
 
-
+        // no hard coded departments
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
 
