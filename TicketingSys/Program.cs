@@ -122,16 +122,14 @@ builder.Services.AddScoped<IUserUtils, UserUtils>();
 builder.Services.AddScoped<IAuthorizationHandler, RoleInDbHandler>();
 
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      builder =>
-                      {
-                          builder.WithOrigins("*");
-                      });
+    options.AddPolicy("AllowReactDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
@@ -142,6 +140,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowReactDev");
 
 app.UseHttpsRedirection();
 
