@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ZtFImsq5Ok8=",
+  "dgSpecHash": "z9J6Rlwdank=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSys.Tests\\TicketingSys.Tests.csproj",
+  "projectFilePath": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys.Tests\\TicketingSys.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Bakir Mehremic\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Bakir Mehremic\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
