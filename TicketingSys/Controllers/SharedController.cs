@@ -12,9 +12,10 @@ using TicketingSys.Models;
 using TicketingSys.Service;
 
 namespace TicketingSys.Controllers
-{   
+{
+    // NOTE:
     // routes that can be used by multiple user roles are here (admin, hr and it)
-
+    [Route("shared")]
     [ApiController]
     public class SharedController : ControllerBase
     {

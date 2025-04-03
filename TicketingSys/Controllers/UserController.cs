@@ -12,6 +12,7 @@ using TicketingSys.Util;
 
 namespace TicketingSys.Controllers
 {
+    [Route("user")]
     [ApiController]
     public class UserController : ControllerBase
     {
