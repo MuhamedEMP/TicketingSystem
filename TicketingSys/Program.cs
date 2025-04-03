@@ -122,6 +122,17 @@ builder.Services.AddScoped<IUserUtils, UserUtils>();
 builder.Services.AddScoped<IAuthorizationHandler, RoleInDbHandler>();
 
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      builder =>
+                      {
+                          builder.WithOrigins("*");
+                      });
+});
 
 var app = builder.Build();
 

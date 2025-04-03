@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using TicketingSys.Contracts.Misc;
 using TicketingSys.Models;
 using TicketingSys.Settings;
 
@@ -13,10 +14,12 @@ namespace TicketingSys.Controllers
     {
 
         private readonly ApplicationDbContext _db;
+        private readonly IUserUtils _userUtils;
 
-        public AuthController(ApplicationDbContext db)
+        public AuthController(ApplicationDbContext db, IUserUtils userUtils)
         {
             _db = db;
+            _userUtils = userUtils;
             
         }
 
@@ -26,9 +29,7 @@ namespace TicketingSys.Controllers
         public async Task<IActionResult> registerUser()
         {
             // sub is the user id
-            var sub = User.FindFirst("sub")?.Value
-            ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+            var sub = _userUtils.getUserId();
             var email = User.FindFirst("unique_name")?.Value
                       ?? User.FindFirst(ClaimTypes.Email)?.Value;
 
@@ -44,6 +45,15 @@ namespace TicketingSys.Controllers
             var firstName = User.FindFirst("given_name")?.Value;
             var lastName = User.FindFirst("family_name")?.Value;
             var fullName = User.FindFirst("name")?.Value;
+
+
+            if (string.IsNullOrEmpty(sub))
+            {
+                return BadRequest("❌ Token is missing 'sub' claim or user is not authenticated.");
+            }
+
+
+            //return Ok((sub, email, roles, fullName).ToString());
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.userId == sub);
             if (user == null)
