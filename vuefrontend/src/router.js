@@ -10,9 +10,14 @@ const routes = [
   { path: '/home', component: Home },
   { path: '/user/mytickets', component: UserMyTickets },
   { path: "/user/newticket", component: NewTicket },
+  {
+    path: '/user//tickets/:id',
+    name: 'ViewTicket',
+    component: () => import('./pages/ViewTicket.vue')
+  }
 ];
 
 export const router = createRouter({
-  history: createWebHistory(), // <- ✅ must be history mode
+  history: createWebHistory(), 
   routes,
 });

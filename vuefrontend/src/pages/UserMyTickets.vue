@@ -47,7 +47,8 @@
   
   <script setup>
   import { ref, onMounted } from 'vue';
-  
+  import { filterMyTickets } from '../api/userApi';
+
   const tickets = ref([]);
   const filters = ref({
     status: '',
@@ -72,27 +73,15 @@
       }
     }
   
-    const token = localStorage.getItem('accessToken');
-  
     try {
-      const response = await fetch(`http://localhost:5172/user/filter?${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      if (response.ok) {
-        tickets.value = await response.json();
-      } else if (response.status === 400) {
-        tickets.value = [];
-        noResults.value = true;
-      } else {
-        console.error('Unexpected error:', response.status);
-        console.log(response.json());
-      }
-    } catch (err) {
-      console.error('Request failed:', err);
-    }
+    const { tickets: filteredTickets } = await filterMyTickets(params);
+    tickets.value = filteredTickets;
+    noResults.value = filteredTickets.length === 0;
+  } catch (error) {
+    console.error('Error fetching tickets:', error);
+    tickets.value = [];
+    noResults.value = true;
+  }
   };
   
   onMounted(fetchTickets);

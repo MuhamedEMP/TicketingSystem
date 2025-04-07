@@ -45,45 +45,52 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+import { ref } from 'vue';
+import { submitNewTicket } from '../api/userApi';
+
+const ticket = ref({
+  categoryId: null,
+  departmentId: null,
+  title: '',
+  urgency: 0,
+  description: '',
+  attachments: [],
+});
+
+const handleFiles = (event) => {
+  const files = event.target.files;
+  ticket.value.attachments = Array.from(files).map(file => ({
+    fileName: file.name
+    // fileData: file,  -- RESOLVE WHEN BLOB STORAGE IS ADDED
+  }));
+};
+
+
+
+const resetForm = () => {
+    ticket.value.title = '';
+    ticket.value.urgency = 0;
+    ticket.value.categoryId = null;
+    ticket.value.departmentId = null;
+    ticket.value.description = '';
+    ticket.value.attachments = [];
   
-  const ticket = ref({
-    categoryId: null,
-    departmentId: null,
-    title: '',
-    urgency: 0,
-    description: '',
-    attachments: [],
-  });
-  
-  const handleFiles = (event) => {
-    const files = event.target.files;
-    ticket.value.attachments = Array.from(files).map(file => ({
-      fileName: file.name,
-      fileData: file, // Handle encoding to base64 or FormData on submit if needed
-    }));
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) fileInput.value = '';
   };
+
   
-  const submitTicket = async () => {
-    console.log(JSON.stringify(ticket.value));
-    const token = localStorage.getItem("accessToken");
-  
-    const response = await fetch('http://localhost:5172/user/newticket', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(ticket.value),
-    });
-  
-    if (response.ok) {
-      alert("Ticket submitted!");
-    } else {
-      console.error("Failed to submit ticket");
-    }
-  };
-  </script>
+const submitTicket = async () => {
+  try {
+    await submitNewTicket(ticket.value);
+    alert("Ticket submitted!");
+    resetForm();
+  } catch (error) {
+    console.error("Failed to submit ticket:", error);
+  }
+};
+
+</script>
   
   <style scoped>
     @import '../assets/css/newticket.css';
