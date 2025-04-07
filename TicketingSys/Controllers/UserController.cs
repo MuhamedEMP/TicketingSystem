@@ -12,6 +12,7 @@ using TicketingSys.Util;
 
 namespace TicketingSys.Controllers
 {
+    [Authorize(Policy = "UserFromDb")]
     [Route("user")]
     [ApiController]
     public class UserController : ControllerBase
@@ -30,7 +31,6 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize]
         [HttpPost("newticket")]
         public async Task<IActionResult> NewTicket([FromBody] NewTicketDto dto)
         {
@@ -49,9 +49,7 @@ namespace TicketingSys.Controllers
             return Ok(savedTicket); // Or map to a DTO before returning
         }
 
-        
-
-        [Authorize]
+       
         [HttpGet("tickets/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto>> GetMyTicketById(int ticketId)
         {
@@ -68,7 +66,6 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize]
         [HttpGet("mytickets")]
         public async Task<ActionResult<List<ViewTicketDto>>> GetAllMyTickets()
         {
@@ -85,7 +82,6 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize]
         [HttpGet("filter")]
         public async Task<ActionResult<List<ViewTicketDto>>> FilterMyTickets([FromQuery] TicketQueryParamsDto queryDto)
         {
@@ -95,14 +91,14 @@ namespace TicketingSys.Controllers
 
             if(!results.Any())
             {
-                return NotFound("No tickets found");
+                return BadRequest("No tickets matching your search.");
             }
 
             return Ok(results);
         }
 
+
         // get responses to my tickets not the responses i sent 
-        [Authorize]
         [HttpGet("myresponses")]
         public async Task<ActionResult<List<ViewResponseDto>>> getMyResponses()
         {
@@ -116,7 +112,7 @@ namespace TicketingSys.Controllers
             return Ok(results);
         }
 
-        [Authorize]
+
         [HttpGet("recievedresponse/{responseId}")]
         public async Task<ActionResult<ViewResponseDto?>> getRecievedResponse(int responseId)
         {
