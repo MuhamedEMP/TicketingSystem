@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
+using TicketingSys.Dtos.CategoryDtos;
+using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
@@ -10,6 +12,7 @@ using TicketingSys.Enums;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
 using TicketingSys.Service;
+using TicketingSys.Settings;
 
 namespace TicketingSys.Controllers
 {
@@ -22,12 +25,15 @@ namespace TicketingSys.Controllers
         private readonly ISharedService _sharedService;
         private readonly IUserUtils _userUtils;
         private readonly IAttachmentService _attachmentService;
+        private readonly ApplicationDbContext _context;
 
-        public SharedController(ISharedService sharedService, IUserUtils userUtils, IAttachmentService attachmentService)
+        public SharedController(ISharedService sharedService, IUserUtils userUtils,
+            IAttachmentService attachmentService, ApplicationDbContext context)
         {
             _sharedService = sharedService;
             _userUtils = userUtils;
             _attachmentService = attachmentService;
+            _context = context;
         }
 
         [Authorize(Policy ="AllRoles")]
@@ -222,6 +228,27 @@ namespace TicketingSys.Controllers
             if (response is null) return NotFound("You did not send a response with this id");
 
             return Ok(response);
+        }
+
+        [Authorize(Policy ="AllRoles")]
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategories()
+        {
+            var categories = await _context.TicketCategories
+           .Include(c => c.Department)
+           .ToListAsync();
+
+            var result = categories.Select(c => c.modelToViewDto());
+            return Ok(result);
+        }
+
+        [Authorize(Policy = "AllRoles")]
+        [HttpGet("departments")]
+        public async Task<ActionResult<List<ViewDepartmentDto>>> GetAllDepartments()
+        {
+            var results = await _sharedService.getAllDepartments();
+
+            return Ok(results);
         }
     }
 }

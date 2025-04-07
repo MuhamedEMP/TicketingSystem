@@ -37,8 +37,8 @@ namespace TicketingSys.Mappers
                 SubmittedByName = ticket.SubmittedBy?.fullName ?? "Unknown",
                 AssignedToId = ticket.AssignedToId,
                 AssignedToName = ticket.AssignedTo?.fullName ?? "Unassigned",
-                DepartmentName = ticket.Department?.Name ?? "Unknown", // problem
-                CategoryName = ticket.Category?.Name ?? "Unknown", // problem
+                DepartmentName = ticket.Department?.Name ?? "Unknown", 
+                CategoryName = ticket.Category?.Name ?? "Unknown", 
                 CreatedAt = ticket.CreatedAt,
                 UpdatedAt = ticket.UpdatedAt,
                 AttachmentPaths = ticket.Attachments?.Select(a => a.Path).ToList() ?? new List<string>()

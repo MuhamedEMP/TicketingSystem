@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TicketingSys.Models
 {
@@ -11,9 +12,10 @@ namespace TicketingSys.Models
         public string? Description { get; set; }
 
         // department this category belongs to
-        public int? DepartmentId { get; set; }
+        public int DepartmentId { get; set; }
 
-        public Department? Department { get; set; }
+        [JsonIgnore]
+        public Department Department { get; set; }
 
     }
 }

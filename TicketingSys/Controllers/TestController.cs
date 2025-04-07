@@ -9,6 +9,7 @@ namespace TicketingSys.Controllers
     [Route("Test")]
     public class TestPolicyController : ControllerBase
     {
+
         [Authorize(Policy = "AdminFromDb")]
         [HttpGet("admin")]
         public IActionResult Admin() => Ok("Admin access");

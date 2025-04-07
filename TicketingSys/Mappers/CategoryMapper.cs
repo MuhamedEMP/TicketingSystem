@@ -7,10 +7,13 @@ namespace TicketingSys.Mappers
     {
         public static ViewTicketCategoryDto modelToViewDto(this TicketCategory ticketCategory)
         {
+          
             return new ViewTicketCategoryDto
             {
                 Name = ticketCategory.Name,
-                Description = ticketCategory.Description
+                Description = ticketCategory.Description,
+                DepartmentId = ticketCategory.DepartmentId,
+                DepartmentName = ticketCategory.Department?.Name ?? "Unknown"
             };
         }
     }

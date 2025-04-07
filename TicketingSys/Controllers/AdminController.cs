@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
+using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Models;
 
@@ -62,6 +63,8 @@ namespace TicketingSys.Controllers
 
             return Ok(user);
         }
+
+       
 
         [HttpPost("adddepartment/{deptName}")]
         public async Task<ActionResult> addDepartment(string deptName)

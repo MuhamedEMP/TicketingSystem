@@ -5,11 +5,13 @@ using System.Security.Claims;
 using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
+using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
+using TicketingSys.Settings;
 using TicketingSys.Util;
 
 namespace TicketingSys.Controllers
@@ -23,14 +25,16 @@ namespace TicketingSys.Controllers
         private readonly IAttachmentService _attachmentService;
         private readonly IAdminService _adminService;
         private readonly IUserUtils _userUtils;
+        private readonly ApplicationDbContext _context;
  
         public UserController(IUserService ticketService, IAttachmentService attachmentService,
-                              IUserService userService, IUserUtils userUtils)
+                              IUserService userService, IUserUtils userUtils, ApplicationDbContext context)
         {
             _userService = ticketService;
             _attachmentService = attachmentService;
             _userService = userService;
             _userUtils = userUtils;
+            _context = context;
         }
 
 
@@ -118,12 +122,8 @@ namespace TicketingSys.Controllers
 
         }
 
-        [HttpGet("categories")]
-        public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategories()
-        {
-            var response = await _adminService.getAllCategories();
+        
 
-            return Ok(response);
-        }
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Data;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
+using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
@@ -67,11 +68,18 @@ namespace TicketingSys.Service
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<ViewTicketCategoryDto>> getAllCategories()
+        public async Task<IEnumerable<ViewTicketCategoryDto>> getAllCategories()
         {
-            var models = await _context.TicketCategories.ToListAsync();
-            return models.Select(m => m.modelToViewDto()).ToList();
+            var categories = await _context.TicketCategories
+                .Include(c => c.Department)
+                .ToListAsync(); // ✅ this must stay — executes the SQL
+
+            return categories
+                .Where(c => c != null && c.Department != null)
+                .Select(c => c.modelToViewDto()); // ✅ no ToList() here
         }
+
+
 
         public async Task<bool> deleteCategoryById(int id)
         {
@@ -81,5 +89,6 @@ namespace TicketingSys.Service
             await _context.SaveChangesAsync();
             return true;    
         }
+
     }
 }

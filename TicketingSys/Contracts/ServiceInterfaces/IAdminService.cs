@@ -1,5 +1,7 @@
 ﻿using TicketingSys.Dtos.CategoryDtos;
+using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.UserDtos;
+using TicketingSys.Models;
 
 namespace TicketingSys.Contracts.ServiceInterfaces
 {
@@ -15,7 +17,7 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task addCategory(NewTicketCategoryDto category);
 
-        Task<List<ViewTicketCategoryDto>> getAllCategories();
+        Task<IEnumerable<ViewTicketCategoryDto>> getAllCategories();
 
         Task<bool> deleteCategoryById(int id);
 

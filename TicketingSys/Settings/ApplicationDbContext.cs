@@ -135,15 +135,6 @@ namespace TicketingSys.Settings
                     entity.Property(ta => ta.Path).IsRequired();
                 });
 
-                // TicketCategory
-                modelBuilder.Entity<TicketCategory>(entity =>
-                {
-                    entity.HasKey(tc => tc.Id);
-                    // Mark Name as required
-                    entity.Property(tc => tc.Name).IsRequired();
-
-                    entity.HasIndex(tc => tc.Name).IsUnique();
-                });
 
                 modelBuilder.Entity<TicketCategory>(entity =>
                 {

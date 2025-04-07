@@ -1,4 +1,5 @@
-﻿using TicketingSys.Dtos.ResponseDtos;
+﻿using TicketingSys.Dtos.DepartmentDtos;
+using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Enums;
@@ -31,5 +32,7 @@ namespace TicketingSys.Contracts.ServiceInterfaces
         Task<ViewTicketDto?> changeTicketStatus(int ticketId, TicketStatusEnum status, List<string> currentUserRoles);
 
         Task<ViewTicketDto?> assignTicketToUser(int ticketId, string currentUserId, List<string> currentUserRoles);
+
+        Task<List<ViewDepartmentDto>> getAllDepartments();
     }
 }

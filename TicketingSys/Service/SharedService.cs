@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
 using TicketingSys.Contracts.ServiceInterfaces;
+using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
@@ -307,6 +308,16 @@ namespace TicketingSys.Service
             await _context.SaveChangesAsync();
 
             return ticket.modelToViewDto();
+        }
+
+        public async Task<List<ViewDepartmentDto>> getAllDepartments()
+        {
+            var departments = await _context.Departments.ToListAsync();
+            return departments.Select(d => new ViewDepartmentDto
+            {
+                Id = d.Id,
+                Name = d.Name,
+            }).ToList();
         }
 
     }
