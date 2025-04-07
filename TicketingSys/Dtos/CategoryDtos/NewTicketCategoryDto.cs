@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TicketingSys.Dtos.TicketDtos
+namespace TicketingSys.Dtos.CategoryDtos
 {
     public class NewTicketCategoryDto
     {
         public string Name { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }

@@ -5,5 +5,7 @@
         string? getUserId();
 
         Task<List<string>?> getUserRoles();
+
+        Task<bool> checkIfCategoryIsValid(int categoryId, int departmentId);
     }
 }

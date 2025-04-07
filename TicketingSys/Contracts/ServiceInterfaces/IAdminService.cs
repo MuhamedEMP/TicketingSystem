@@ -1,4 +1,4 @@
-﻿using TicketingSys.Dtos.TicketDtos;
+﻿using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.UserDtos;
 
 namespace TicketingSys.Contracts.ServiceInterfaces
@@ -14,6 +14,10 @@ namespace TicketingSys.Contracts.ServiceInterfaces
         Task addDepartment(string name);
 
         Task addCategory(NewTicketCategoryDto category);
+
+        Task<List<ViewTicketCategoryDto>> getAllCategories();
+
+        Task<bool> deleteCategoryById(int id);
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TicketingSys.Settings;
@@ -12,9 +13,11 @@ using TicketingSys.Settings;
 namespace TicketingSys.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250407110547_categoryFk")]
+    partial class categoryFk
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,7 +202,7 @@ namespace TicketingSys.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("DepartmentId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
@@ -329,7 +332,8 @@ namespace TicketingSys.Migrations
                     b.HasOne("TicketingSys.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Department");
                 });

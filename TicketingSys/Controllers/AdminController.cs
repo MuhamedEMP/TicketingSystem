@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TicketingSys.Contracts.ServiceInterfaces;
-using TicketingSys.Dtos.TicketDtos;
+using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Models;
 
@@ -11,7 +11,7 @@ namespace TicketingSys.Controllers
 {
     [Route("admin")]
     [ApiController]
-    //[Authorize(Policy ="AdminFromDb")]
+    [Authorize(Policy ="AdminFromDb")]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
@@ -73,6 +73,14 @@ namespace TicketingSys.Controllers
             return Ok("Created department with name "+lowercase);
         }
 
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategories()
+        {
+            var response = await _adminService.getAllCategories();
+
+            return Ok(response);
+        }
+
 
         [HttpPost("addcategory")]
         public async Task<ActionResult<NewTicketCategoryDto>> addCategory([FromBody] NewTicketCategoryDto dto)
@@ -81,5 +89,15 @@ namespace TicketingSys.Controllers
             return Ok($"Added category with name:{dto.Name} and description {dto.Description}");
         }
 
+
+        [HttpDelete("deletecategory/{Id}")]
+        public async Task<ActionResult> deleteCategory(int Id)
+        {
+            var isOk = await _adminService.deleteCategoryById(Id);
+
+            if(isOk == true) return Ok($"Category with id {Id} deleted.");
+
+            return NotFound();
+        }
     }
 }

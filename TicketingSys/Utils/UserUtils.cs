@@ -41,6 +41,28 @@ namespace TicketingSys.Util
             return normalizedRoles;
 
         }
+
+        public async Task<bool> checkIfCategoryIsValid(int categoryId, int departmentId)
+        {
+            var category = await _context.TicketCategories.FindAsync(categoryId);
+
+            if (category == null)
+            {
+                Console.WriteLine($"❌ Category with ID {categoryId} not found");
+                return false;
+            }
+
+            Console.WriteLine($"✅ Found category {category.Name}, category.DepartmentId = {category.DepartmentId}, given departmentId = {departmentId}");
+
+            if (category.DepartmentId != departmentId)
+            {
+                Console.WriteLine("❌ DepartmentId mismatch");
+                return false;
+            }
+
+            return true;
+        }
+
     }
 
 }

@@ -8,7 +8,12 @@ namespace TicketingSys.Models
 
         public string Name { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
+
+        // department this category belongs to
+        public int? DepartmentId { get; set; }
+
+        public Department? Department { get; set; }
 
     }
 }

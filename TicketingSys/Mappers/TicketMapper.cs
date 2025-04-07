@@ -50,5 +50,6 @@ namespace TicketingSys.Mappers
         {
             return tickets.Select(t => t.modelToViewDto()).ToList();
         }
+
     }
 }

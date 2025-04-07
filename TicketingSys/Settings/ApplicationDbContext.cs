@@ -144,6 +144,22 @@ namespace TicketingSys.Settings
 
                     entity.HasIndex(tc => tc.Name).IsUnique();
                 });
+
+                modelBuilder.Entity<TicketCategory>(entity =>
+                {
+                    entity.HasKey(tc => tc.Id);
+
+                    entity.Property(tc => tc.Name).IsRequired();
+
+                    entity.HasIndex(tc => tc.Name).IsUnique();
+
+                    // 🔗 Relationship: TicketCategory -> Department
+                    entity.HasOne(tc => tc.Department)
+                          .WithMany()
+                          .HasForeignKey(tc => tc.DepartmentId)
+                          .OnDelete(DeleteBehavior.Cascade);
+                });
+
             });
             
         }

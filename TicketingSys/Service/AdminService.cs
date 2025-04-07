@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
 using TicketingSys.Contracts.ServiceInterfaces;
-using TicketingSys.Dtos.TicketDtos;
+using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
@@ -67,5 +67,19 @@ namespace TicketingSys.Service
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<ViewTicketCategoryDto>> getAllCategories()
+        {
+            var models = await _context.TicketCategories.ToListAsync();
+            return models.Select(m => m.modelToViewDto()).ToList();
+        }
+
+        public async Task<bool> deleteCategoryById(int id)
+        {
+            var category = await _context.TicketCategories.FirstOrDefaultAsync(c => c.Id == id);
+            if (category != null) return false;
+            _context.Remove(category);
+            await _context.SaveChangesAsync();
+            return true;    
+        }
     }
 }

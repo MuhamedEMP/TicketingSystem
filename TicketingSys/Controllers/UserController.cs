@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
+using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Dtos.UserDtos;
@@ -21,6 +23,7 @@ namespace TicketingSys.Controllers
         private readonly IAttachmentService _attachmentService;
         private readonly IAdminService _adminService;
         private readonly IUserUtils _userUtils;
+ 
         public UserController(IUserService ticketService, IAttachmentService attachmentService,
                               IUserService userService, IUserUtils userUtils)
         {
@@ -32,9 +35,14 @@ namespace TicketingSys.Controllers
 
 
         [HttpPost("newticket")]
-        public async Task<IActionResult> NewTicket([FromBody] NewTicketDto dto)
+        public async Task<ActionResult<ViewTicketDto>> NewTicket([FromBody] NewTicketDto dto)
         {
             var userId = _userUtils.getUserId();
+
+            var isValidCategory = await _userUtils.checkIfCategoryIsValid(categoryId: dto.CategoryId, departmentId: dto.DepartmentId);
+
+            if (isValidCategory == false)
+                return BadRequest("Invalid category");
 
             var newTicket = dto.NewDtoToModel(userId);
 
@@ -46,7 +54,7 @@ namespace TicketingSys.Controllers
                 savedTicket.Attachments = attachments;
             }
 
-            return Ok(savedTicket); // Or map to a DTO before returning
+            return Ok(savedTicket.modelToViewDto()); 
         }
 
        
@@ -67,32 +75,16 @@ namespace TicketingSys.Controllers
 
 
         [HttpGet("mytickets")]
-        public async Task<ActionResult<List<ViewTicketDto>>> GetAllMyTickets()
-        {
-            var userId = _userUtils.getUserId();
-
-            var tickets = await _userService.getAllTicketByUserId(userId);
-
-            if (!tickets.Any())
-            {
-                return NotFound("You have no tickets");
-            }
-
-            return tickets.modelToViewDtoList();
-        }
-
-
-        [HttpGet("filter")]
-        public async Task<ActionResult<List<ViewTicketDto>>> FilterMyTickets([FromQuery] TicketQueryParamsDto queryDto)
+        public async Task<ActionResult<List<ViewTicketDto>>> GetMyTickets([FromQuery] TicketQueryParamsDto queryDto)
         {
             var userId = _userUtils.getUserId();
 
             var results = await _userService.filterTickets(userId, queryDto);
 
-            if(!results.Any())
-            {
-                return BadRequest("No tickets matching your search.");
-            }
+            //if(!results.Any())
+            //{
+            //    return NotFound("No tickets matching your search.");
+            //}
 
             return Ok(results);
         }
@@ -124,6 +116,14 @@ namespace TicketingSys.Controllers
 
             return Ok(response);
 
+        }
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategories()
+        {
+            var response = await _adminService.getAllCategories();
+
+            return Ok(response);
         }
     }
 }
