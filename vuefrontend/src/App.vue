@@ -6,12 +6,12 @@ import { computed } from 'vue';
 
 const route = useRoute();
 
-const showNavbar = computed(() => route.path !== '/');
+// const showNavbar = computed(() => route.path !== '/');
 </script>
 
 <template>
   <div>
-    <Navbar v-if="showNavbar" />
+    <!-- <Navbar v-if="showNavbar" /> -->
     <router-view />
   </div>
 </template>

@@ -6,9 +6,22 @@
       <div class="send-to-department">
         <h3 class="oneline">Send Ticket to:</h3>
         <div class="button-container">
-          <button class="button active" id="button1">IT</button>
-          <button class="button" id="button2">HR</button>
-        </div>
+  <button
+    class="button"
+    :class="{ active: activeDepartmentId === 1 }"
+    @click="setDepartment(1)"
+  >
+    IT
+  </button>
+
+  <button
+    class="button"
+    :class="{ active: activeDepartmentId === 2 }"
+    @click="setDepartment(2)"
+  >
+    HR
+  </button>
+</div>
       </div>
     </div>
 
@@ -44,6 +57,24 @@ const applySearch = () => {
     router.push({ path: '/user/mytickets', query: { search: search.value } });
   }
 };
+
+const activeDepartmentId = ref(null);
+
+const setDepartment = (id) => {
+  activeDepartmentId.value = id;
+  // Emit to parent
+  emit('select-department', id);
+};
+
+// You need this to emit properly
+const emit = defineEmits(['select-department']);
+
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  setDepartment(1); // 👈 auto-select IT on mount
+});
+
 </script>
 
 <style scoped>

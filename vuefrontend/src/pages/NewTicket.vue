@@ -1,5 +1,7 @@
-<!-- src/pages/NewTicket.vue -->
 <template>
+<UserNavbar @select-department="selectDepartment" />
+<div class="overlay"></div>
+
     <div class="new-ticket-page">
       <h1>Create New Ticket</h1>
       <form @submit.prevent="submitTicket">
@@ -47,6 +49,7 @@
   <script setup>
 import { ref } from 'vue';
 import { submitNewTicket } from '../api/userApi';
+import UserNavbar from '../components/UserNavbar.vue';
 
 const ticket = ref({
   categoryId: null,
@@ -79,7 +82,7 @@ const resetForm = () => {
     if (fileInput) fileInput.value = '';
   };
 
-  
+
 const submitTicket = async () => {
   try {
     await submitNewTicket(ticket.value);

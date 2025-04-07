@@ -1,4 +1,6 @@
 <template>
+  <UserNavbar @select-department="selectDepartment" />
+  <div class="overlay"></div>
     <div class="ticket-page">
       <div class="filter-bar">
         <input v-model="filters.search" placeholder="Search..." />
@@ -48,7 +50,8 @@
   <script setup>
   import { ref, onMounted } from 'vue';
   import { filterMyTickets } from '../api/userApi';
-
+  import UserNavbar from '../components/UserNavbar.vue';
+  
   const tickets = ref([]);
   const filters = ref({
     status: '',
