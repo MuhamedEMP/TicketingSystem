@@ -8,12 +8,7 @@ namespace TicketingSys.Dtos.TicketDtos
 {
     public class NewTicketDto
     {
-        [Required]
-        public int CategoryId { get; set; }
-
-        [Required]
-        public int DepartmentId { get; set; }
-
+        
         public List<NewTicketAttachmentDto> Attachments { get; set; } = new List<NewTicketAttachmentDto>();
 
         [Required]

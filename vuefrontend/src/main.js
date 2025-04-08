@@ -12,7 +12,8 @@ const msal = new PublicClientApplication(msalConfig);
 (async () => {
   await msal.initialize();
 
-  const result = await msal.handleRedirectPromise(); // 👈 crucial!
+  const result = await msal.handleRedirectPromise(); 
+
   if (result) {
     msal.setActiveAccount(result.account);
 
@@ -23,6 +24,31 @@ const msal = new PublicClientApplication(msalConfig);
 
     localStorage.setItem("accessToken", tokenResponse.accessToken);
 
+    const userResponse = await fetch("http://localhost:5172/shared/myprofile", {
+      headers: {
+        Authorization: `Bearer ${tokenResponse.accessToken}`,
+      },
+    });
+
+    if (userResponse.ok){
+      const user = await userResponse.json();
+      localStorage.setItem("roles", JSON.stringify(user.roles));
+      localStorage.setItem("userFullName", user.fullName);
+
+      const roles = user.roles?.map(r => r.toLowerCase());
+
+      if (roles.includes("admin")) {
+ // these role based checks work
+        router.push("/profile");
+        return;
+      } 
+      router.push("/home");
+      return;
+      // handle HR AND IT ROLES - MAYBE DONT HARDCODE?
+    } else {
+      console.error("Failed to fetch user info");
+      router.push("/home");
+    }
   }
 
   const app = createApp(App);
@@ -31,7 +57,6 @@ const msal = new PublicClientApplication(msalConfig);
   app.mount("#app");
 
   if (result && window.location.pathname === "/") {
-    await router.isReady(); 
     router.push("/home");
     console.log("redirect ");
   }

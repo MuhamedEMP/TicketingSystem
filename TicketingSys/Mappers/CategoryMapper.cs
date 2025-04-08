@@ -10,6 +10,7 @@ namespace TicketingSys.Mappers
           
             return new ViewTicketCategoryDto
             {
+                Id = ticketCategory.Id,
                 Name = ticketCategory.Name,
                 Description = ticketCategory.Description,
                 DepartmentId = ticketCategory.DepartmentId,

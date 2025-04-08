@@ -54,21 +54,16 @@ namespace TicketingSys.Service
 
             return ticket.SortByStatusAndUrgency();
         }
-
         public async Task<List<ViewTicketDto>?> filterTickets(string userId, TicketQueryParamsDto filters)
         {
             var query = _context.Tickets
-            .Include(t => t.SubmittedBy)
-            .Include(t => t.AssignedTo)
-            .Include(t => t.Category)
-            .Include(t => t.Department)
-            .Include(t => t.Attachments)
-            .Where(t => t.SubmittedById == userId)
-            .AsQueryable();
-
-
-            if (!string.IsNullOrEmpty(userId))
-                query = query.Where(t => t.SubmittedById == userId);
+                .Include(t => t.SubmittedBy)
+                .Include(t => t.AssignedTo)
+                .Include(t => t.Category)
+                .Include(t => t.Department)
+                .Include(t => t.Attachments)
+                .Where(t => t.SubmittedById == userId)
+                .AsQueryable();
 
             if (filters.Status.HasValue)
                 query = query.Where(t => t.Status == filters.Status.Value);
@@ -76,14 +71,23 @@ namespace TicketingSys.Service
             if (filters.Urgency.HasValue)
                 query = query.Where(t => t.Urgency == filters.Urgency.Value);
 
-            if (!string.IsNullOrEmpty(filters.AssignedToId))
-                query = query.Where(t => t.AssignedToId == filters.AssignedToId);
+            if (!string.IsNullOrWhiteSpace(filters.AssignedToName))
+            {
+                string assignedTo = filters.AssignedToName.ToLower();
+                query = query.Where(t => t.AssignedTo != null && t.AssignedTo.fullName.ToLower().Contains(assignedTo));
+            }
 
-            if (filters.CategoryId.HasValue)
-                query = query.Where(t => t.CategoryId == filters.CategoryId.Value);
+            if (!string.IsNullOrWhiteSpace(filters.CategoryName))
+            {
+                string category = filters.CategoryName.ToLower();
+                query = query.Where(t => t.Category != null && t.Category.Name.ToLower().Contains(category));
+            }
 
-            if (filters.DepartmentId.HasValue)
-                query = query.Where(t => t.DepartmentId == filters.DepartmentId.Value);
+            if (!string.IsNullOrWhiteSpace(filters.DepartmentName))
+            {
+                string department = filters.DepartmentName.ToLower();
+                query = query.Where(t => t.Department != null && t.Department.Name.ToLower().Contains(department));
+            }
 
             if (filters.FromDate.HasValue)
                 query = query.Where(t => t.CreatedAt >= filters.FromDate.Value);
@@ -104,6 +108,7 @@ namespace TicketingSys.Service
 
             return sorted.Select(t => t.modelToViewDto()).ToList();
         }
+
 
         public async Task<List<ViewResponseDto>> getResponsesToUserTickets(string userId)
         {

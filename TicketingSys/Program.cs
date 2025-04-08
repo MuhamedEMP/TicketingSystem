@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
+using TicketingSys.Middleware;
 using TicketingSys.Models;
 using TicketingSys.RoleUtils;
 using TicketingSys.Service;
@@ -141,6 +142,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors("AllowReactDev");
+
+// to return 401 when no userId in JWT
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

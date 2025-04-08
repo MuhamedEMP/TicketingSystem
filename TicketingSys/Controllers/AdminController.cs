@@ -89,7 +89,7 @@ namespace TicketingSys.Controllers
         public async Task<ActionResult<NewTicketCategoryDto>> addCategory([FromBody] NewTicketCategoryDto dto)
         {
             await _adminService.addCategory(dto);
-            return Ok($"Added category with name:{dto.Name} and description {dto.Description}");
+            return Ok($"Added category with name:{dto.Name} and description: {dto.Description}");
         }
 
 

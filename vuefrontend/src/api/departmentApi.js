@@ -1,16 +1,13 @@
+import api from "../utils/api"
+
 export async function getAllDepartments() {
-    const token = localStorage.getItem("accessToken");
+    const response = await api.get("http://localhost:5172/shared/departments");
+    return response.data;
+  }
   
-    const response = await fetch("http://localhost:5172/shared/departments", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  
-    if (!response.ok) {
-      throw new Error("Failed to fetch departments");
-    }
-  
-    return await response.json();
+
+  export async function getDepartmentById(id) {
+    const response = await api.get(`http://localhost:5172/shared/departments/${id}`);
+    return response.data;
   }
   

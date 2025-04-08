@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
 using TicketingSys.Contracts.ServiceInterfaces;
+using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.ResponseDtos;
 using TicketingSys.Dtos.TicketDtos;
@@ -115,6 +116,25 @@ namespace TicketingSys.Service
             // ✅ Filter by departments the current user is allowed to see
             queryable = queryable.Where(t => normalizedRoles.Contains(t.Department.Name.ToLower()));
 
+            if (!string.IsNullOrWhiteSpace(query.AssignedToName))
+            {
+                string name = query.AssignedToName.ToLower();
+                queryable = queryable.Where(t => t.AssignedTo != null && t.AssignedTo.fullName.ToLower().Contains(name));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CategoryName))
+            {
+                string category = query.CategoryName.ToLower();
+                queryable = queryable.Where(t => t.Category != null && t.Category.Name.ToLower().Contains(category));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.DepartmentName))
+            {
+                string department = query.DepartmentName.ToLower();
+                queryable = queryable.Where(t => t.Department != null && t.Department.Name.ToLower().Contains(department));
+            }
+
+
             // ✅ Apply optional query filters
             if (query.Status.HasValue)
                 queryable = queryable.Where(t => t.Status == query.Status.Value);
@@ -122,17 +142,10 @@ namespace TicketingSys.Service
             if (query.Urgency.HasValue)
                 queryable = queryable.Where(t => t.Urgency == query.Urgency.Value);
 
-            if (!string.IsNullOrEmpty(query.AssignedToId))
-                queryable = queryable.Where(t => t.AssignedToId == query.AssignedToId);
-
+           
             if (!string.IsNullOrEmpty(query.UserId))
                 queryable = queryable.Where(t => t.SubmittedById == query.UserId);
 
-            if (query.CategoryId.HasValue)
-                queryable = queryable.Where(t => t.CategoryId == query.CategoryId.Value);
-
-            if (query.DepartmentId.HasValue)
-                queryable = queryable.Where(t => t.DepartmentId == query.DepartmentId.Value);
 
             if (query.FromDate.HasValue)
                 queryable = queryable.Where(t => t.CreatedAt >= query.FromDate.Value);
@@ -318,6 +331,22 @@ namespace TicketingSys.Service
                 Id = d.Id,
                 Name = d.Name,
             }).ToList();
+        }
+
+        public async Task<ViewDepartmentDto?> getDepartmentById(int id)
+        {
+            var department = await _context.Departments.FirstOrDefaultAsync(d => d.Id == id);
+
+            if (department is null) return null;
+            return department.modelToViewDto();
+        }
+
+        public async Task<ViewTicketCategoryDto?> getCategoryById(int id)
+        {
+            var category = await _context.TicketCategories.FirstOrDefaultAsync(c => c.Id == id);
+
+            if (category is null) return null;
+            return category.modelToViewDto();
         }
 
     }

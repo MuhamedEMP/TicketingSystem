@@ -2,7 +2,7 @@
 {
     public interface IUserUtils
     {
-        string? getUserId();
+        string? getUserIdOr401();
 
         Task<List<string>?> getUserRoles();
 

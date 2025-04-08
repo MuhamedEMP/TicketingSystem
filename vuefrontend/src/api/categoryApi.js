@@ -1,16 +1,18 @@
+import api from "../utils/api"
+
 export async function getAllCategories() {
-    const token = localStorage.getItem("accessToken");
-  
-    const response = await fetch("http://localhost:5172/shared/categories", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  
-    if (!response.ok) {
-      throw new Error("Failed to fetch categories");
-    }
-  
-    return await response.json();
+    const response = await api.get("http://localhost:5172/shared/categories");
+    return response.data;
   }
   
+  
+export async function getCategoriesByDepartment(deptId) {
+    const response = await api.get(`http://localhost:5172/shared/${deptId}/categories`)
+    return response.data;
+  }
+  
+
+  export async function getCategoryById(id) {
+    const response = await api.get(`http://localhost:5172/shared/categories/${id}`);
+    return response.data;
+  }

@@ -29,7 +29,7 @@ namespace TicketingSys.Controllers
         public async Task<IActionResult> registerUser()
         {
             // sub is the user id
-            var sub = _userUtils.getUserId();
+            var sub = _userUtils.getUserIdOr401();
             var email = User.FindFirst("unique_name")?.Value
                       ?? User.FindFirst(ClaimTypes.Email)?.Value;
 
@@ -74,5 +74,6 @@ namespace TicketingSys.Controllers
 
             return Ok($"User EXISTS WITH details :sub-{sub} email-{email} fn-{firstName} ln-{lastName} full-{fullName}, roles {roles}");
         }
+
     }
 }

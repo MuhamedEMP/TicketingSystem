@@ -1,83 +1,40 @@
+import api from "../utils/api"
+
 export async function fetchMyTickets() {
-    const token = localStorage.getItem("accessToken");
-  
-    if (!token) throw new Error("Access token missing");
-  
-    const response = await fetch("http://localhost:5172/user/mytickets", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  
-    if (!response.ok) {
-      throw new Error("Failed to fetch tickets");
-    }
-  
-    return await response.json();
+
+    const response = await api.get("http://localhost:5172/user/mytickets")
+    return response.data;
   }
   
 
-
-export async function submitNewTicket(ticket) {
-  const token = localStorage.getItem("accessToken");
-  if (!token) throw new Error("Access token missing");
-
-  const response = await fetch('http://localhost:5172/user/newticket', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(ticket),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text(); // 👈 log raw error response
-  console.error('Failed to submit ticket:', errorText)
+export async function submitNewTicket(departmentId, categoryId, ticketData) {
+    const response = await api.post(
+      `/user/newticket/${departmentId}/${categoryId}`,
+      ticketData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  
+    return response.data; 
+  }
+  
+  export async function filterMyTickets(params) {
+    const response = await api.get(`/user/mytickets?${params.toString()}`);
+    return { tickets: response.data };
   }
 
-  return await response.json();
-}
 
-
-
-export async function filterMyTickets(params) {
-  const token = localStorage.getItem("accessToken");
-
-  try {
-    const response = await fetch(`http://localhost:5172/user/mytickets?${params.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      return { tickets: result }; 
-    } else {
-      console.error('Unexpected error:', response.status);
-      return { tickets: [] };
-    }
-  } catch (err) {
-    console.error('Request failed:', err);
-    return { tickets: [] };
+  export async function getMyTicketById(ticketId) {
+    const response = await api.get(`/user/tickets/${ticketId}`);
+    return response.data;
   }
-}
+  
 
-
-export async function getMyTicketById(ticketId) {
-  const token = localStorage.getItem("accessToken");
-
-  const response = await fetch(`http://localhost:5172/user/tickets/${ticketId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Failed to fetch ticket ${ticketId}`);
+  export async function getUserProfile() {
+    const response = await api.get("http://localhost:5172/shared/myprofile");
+    return response.data;
   }
-
-  return await response.json();
-}
+  

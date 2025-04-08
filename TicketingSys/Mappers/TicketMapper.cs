@@ -8,13 +8,13 @@ namespace TicketingSys.Mappers
     {
         // maps to a model without ticketAttachments because that table needs 
         // Ticket Id, they will be mapped to the Ticket in AttachmentMapper
-        public static Ticket NewDtoToModel(this NewTicketDto dto, string createdById)
+        public static Ticket NewDtoToModel(this NewTicketDto dto, string createdById, int categoryId, int departmentId)
         {
             return new Ticket
             {
                 SubmittedById = createdById,
-                CategoryId = dto.CategoryId,
-                DepartmentId = dto.DepartmentId,
+                CategoryId = categoryId,
+                DepartmentId = departmentId,
                 Status = Enums.TicketStatusEnum.Open,
                 Title = dto.Title,
                 Urgency = dto.Urgency,

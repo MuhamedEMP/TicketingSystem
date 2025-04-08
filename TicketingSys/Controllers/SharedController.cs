@@ -40,7 +40,7 @@ namespace TicketingSys.Controllers
         [HttpGet("myprofile")]
         public async Task<ActionResult<ViewUserDto>> myProfile()
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var user = await _sharedService.getUserById(userId);
 
@@ -72,7 +72,7 @@ namespace TicketingSys.Controllers
         [HttpGet("alltickets")] 
         public async Task<ActionResult<List<ViewTicketDto>>> getAllTickets()
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var tickets = await _sharedService.getAllTicketsFromMyDepartment(userId);
 
@@ -87,7 +87,7 @@ namespace TicketingSys.Controllers
         [HttpGet("querytickets")]
         public async Task<ActionResult<List<ViewTicketDto>>> GetAllTicketsWithQuery([FromQuery] SharedTicketQueryParamsDto query)
         {
-            var currentUserId = _userUtils.getUserId(); 
+            var currentUserId = _userUtils.getUserIdOr401(); 
 
             var results = await _sharedService.queryAlLTicketsFromMyDepartment(currentUserId, query);
 
@@ -162,7 +162,7 @@ namespace TicketingSys.Controllers
         public async Task<ActionResult<ViewTicketDto?>> assignTicketToMe(int ticketId)
         {
             var currentUserRoles = await _userUtils.getUserRoles();
-            var currentUserId = _userUtils.getUserId(); 
+            var currentUserId = _userUtils.getUserIdOr401(); 
 
             if (string.IsNullOrEmpty(currentUserId) || currentUserRoles == null || currentUserRoles.Count == 0)
                 return Forbid();
@@ -179,7 +179,7 @@ namespace TicketingSys.Controllers
         [HttpPost("response")] 
         public async Task<IActionResult> AddResponse([FromBody] NewResponseDto dto)
         {
-            var userId =_userUtils.getUserId();
+            var userId =_userUtils.getUserIdOr401();
             var CurrentUserRoles = await _userUtils.getUserRoles();
 
             var referencedTicket = await _sharedService.getTicketById(dto.TicketId);
@@ -204,7 +204,7 @@ namespace TicketingSys.Controllers
         [HttpGet("sentresponses")]
         public async Task<ActionResult<List<ViewResponseDto>>> getSentResponses()
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var results = await _sharedService.getResponsesSentByUser(userId);
 
@@ -221,7 +221,7 @@ namespace TicketingSys.Controllers
         public async Task<ActionResult<ViewResponseDto?>> getSentResponse(int responseId)
         {
 
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var response = await _sharedService.getSentResponseByUserIdAndResponseId(userId, responseId);
 
@@ -229,6 +229,7 @@ namespace TicketingSys.Controllers
 
             return Ok(response);
         }
+
 
         [Authorize(Policy ="AllRoles")]
         [HttpGet("categories")]
@@ -242,6 +243,32 @@ namespace TicketingSys.Controllers
             return Ok(result);
         }
 
+
+        [Authorize(Policy = "AllRoles")]
+        [HttpGet("categories/{categoryId}")]
+        public async Task<ActionResult<ViewDepartmentDto?>> getCategoryById(int categoryId)
+        {
+            var result = await _sharedService.getCategoryById(categoryId);
+
+            if (result == null) return NotFound();
+
+            return Ok(result);
+        }
+
+
+        [Authorize(Policy = "AllRoles")]
+        [HttpGet("{deptId}/categories")]
+        public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategoriesById(int deptId)
+        {
+            var categories = await _context.TicketCategories.Where(c=> c.DepartmentId==deptId)
+           .Include(c => c.Department)
+           .ToListAsync();
+
+            var result = categories.Select(c => c.modelToViewDto());
+            return Ok(result);
+        }
+
+
         [Authorize(Policy = "AllRoles")]
         [HttpGet("departments")]
         public async Task<ActionResult<List<ViewDepartmentDto>>> GetAllDepartments()
@@ -250,5 +277,18 @@ namespace TicketingSys.Controllers
 
             return Ok(results);
         }
+
+
+        [Authorize(Policy ="AllRoles")]
+        [HttpGet("departments/{departmentId}")]
+        public async Task<ActionResult<ViewDepartmentDto?>> getDepartmentById(int departmentId)
+        {
+            var result = await _sharedService.getDepartmentById(departmentId);
+
+            if (result == null) return NotFound();
+
+            return Ok(result);
+        }
+
     }
 }

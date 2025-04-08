@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TicketingSys.Contracts.Misc;
+using TicketingSys.Exceptions;
 using TicketingSys.Models;
 using TicketingSys.Settings;
 
@@ -18,16 +19,23 @@ namespace TicketingSys.Util
             _context = context;
         }
 
-        public string? getUserId()
+        public string? getUserIdOr401()
         { // sub is the user id
             var user = _httpContextAccessor.HttpContext?.User;
-            return user?.FindFirst("sub")?.Value
-                ?? user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = user?.FindFirst("sub")?.Value
+                      ?? user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            // handling the exception and returning 401 is handled in ExceptionHandlingMiddleware
+            if (string.IsNullOrEmpty(userId))
+                throw new NoUserIdInJwtException("User not authenticated.");
+
+            return userId;
         }
+
 
         public async Task<List<string>?> getUserRoles()
         {
-            var userId = getUserId();
+            var userId = getUserIdOr401();
             if (userId == null) return null;
 
             var user = await _context.Users.FirstOrDefaultAsync(u=> u.userId == userId);

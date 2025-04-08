@@ -38,17 +38,18 @@ namespace TicketingSys.Controllers
         }
 
 
-        [HttpPost("newticket")]
-        public async Task<ActionResult<ViewTicketDto>> NewTicket([FromBody] NewTicketDto dto)
+        [HttpPost("newticket/{departmentId}/{categoryId}")]
+        public async Task<ActionResult<ViewTicketDto>> NewTicket([FromBody] NewTicketDto dto,
+            int categoryId, int departmentId)
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
-            var isValidCategory = await _userUtils.checkIfCategoryIsValid(categoryId: dto.CategoryId, departmentId: dto.DepartmentId);
+            var isValidCategory = await _userUtils.checkIfCategoryIsValid(categoryId: categoryId, departmentId: departmentId);
 
             if (isValidCategory == false)
                 return BadRequest("Invalid category");
 
-            var newTicket = dto.NewDtoToModel(userId);
+            var newTicket = dto.NewDtoToModel(userId, categoryId, departmentId);
 
             var savedTicket = await _userService.addNewTicket(newTicket);
 
@@ -65,7 +66,7 @@ namespace TicketingSys.Controllers
         [HttpGet("tickets/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto>> GetMyTicketById(int ticketId)
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var ticket = await _userService.getTicketByUserIdAndTicketId(userId, ticketId);
 
@@ -81,7 +82,7 @@ namespace TicketingSys.Controllers
         [HttpGet("mytickets")]
         public async Task<ActionResult<List<ViewTicketDto>>> GetMyTickets([FromQuery] TicketQueryParamsDto queryDto)
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var results = await _userService.filterTickets(userId, queryDto);
 
@@ -94,11 +95,11 @@ namespace TicketingSys.Controllers
         }
 
 
-        // get responses to my tickets not the responses i sent 
+        // get responses to my tickets 
         [HttpGet("myresponses")]
         public async Task<ActionResult<List<ViewResponseDto>>> getMyResponses()
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var results = await _userService.getResponsesToUserTickets(userId);
 
@@ -112,7 +113,7 @@ namespace TicketingSys.Controllers
         [HttpGet("recievedresponse/{responseId}")]
         public async Task<ActionResult<ViewResponseDto?>> getRecievedResponse(int responseId)
         {
-            var userId = _userUtils.getUserId();
+            var userId = _userUtils.getUserIdOr401();
 
             var response = await _userService.GetResponseToMyTicketById(userId, responseId);
 
