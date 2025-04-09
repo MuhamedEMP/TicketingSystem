@@ -87,14 +87,6 @@ namespace TicketingSys.Controllers
             return Ok("Created department with name "+lowercase);
         }
 
-        [HttpGet("categories")]
-        public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategories()
-        {
-            var response = await _adminService.getAllCategories();
-
-            return Ok(response);
-        }
-
 
         [HttpPost("addcategory")]
         public async Task<ActionResult<NewTicketCategoryDto>> addCategory([FromBody] NewTicketCategoryDto dto)
