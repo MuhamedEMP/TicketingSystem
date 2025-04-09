@@ -12,4 +12,11 @@
     padding: 2rem;
   }
   </style>
-  
+<script setup>
+import { onMounted } from 'vue';
+import { refreshUserRoles } from '../../utils/userUtils'; 
+
+onMounted(() => {
+  refreshUserRoles();
+});
+</script>

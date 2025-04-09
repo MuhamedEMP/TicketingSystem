@@ -33,9 +33,9 @@ namespace TicketingSys.Service
             return user.userModelToDto();
         }
 
-        public async Task<ViewUserDto?> changeRole(ChangeRoleDto dto)
+        public async Task<ViewUserDto?> changeRole(ChangeRoleDto dto, string userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.userId == dto.userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.userId == userId);
             if (user == null) return null;
 
             var roles = dto.roles.Select(r => r.ToLower()).ToList();
@@ -88,6 +88,43 @@ namespace TicketingSys.Service
             _context.Remove(category);
             await _context.SaveChangesAsync();
             return true;    
+        }
+
+        public async Task<List<ViewUserDto>> queryUsers(UserQueryParamsDto queryParams)
+        {
+            var usersQuery = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(queryParams.firstName))
+            {
+                usersQuery = usersQuery.Where(u => u.firstName.ToLower().Contains(queryParams.firstName.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryParams.lastName))
+            {
+                usersQuery = usersQuery.Where(u => u.lastName.ToLower().Contains(queryParams.lastName.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryParams.fullName))
+            {
+                usersQuery = usersQuery.Where(u =>
+                    (u.firstName + " " + u.lastName).ToLower().Contains(queryParams.fullName.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryParams.email))
+            {
+                usersQuery = usersQuery.Where(u => u.email.ToLower().Contains(queryParams.email.ToLower()));
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryParams.role))
+            {
+                var roleFilter = queryParams.role.ToLower();
+                usersQuery = usersQuery.Where(u =>
+                    u.roles.Any(r => r.ToLower().Contains(roleFilter)));
+            }
+
+            var users = await usersQuery.ToListAsync();
+
+            return users.Select(u => u.userModelToDto()).ToList();
         }
 
     }

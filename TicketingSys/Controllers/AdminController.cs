@@ -37,6 +37,14 @@ namespace TicketingSys.Controllers
 
         }
 
+        [HttpGet("users/query")]
+        public async Task<ActionResult<List<ViewUserDto>>> queryAllUsers([FromQuery] UserQueryParamsDto userQueryParamsDto)
+        {
+            var users = await _adminService.queryUsers(userQueryParamsDto);
+
+            return Ok(users);
+        }
+
 
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<ViewUserDto>> viewUser(string userId)
@@ -51,14 +59,17 @@ namespace TicketingSys.Controllers
         }
 
 
-        [HttpPatch("changerole")]
-        public async Task<ActionResult<ViewUserDto>> changeUserRole([FromBody] ChangeRoleDto dto)
+
+
+        [HttpPatch("changerole/{userId}")]
+        public async Task<ActionResult<ViewUserDto>> changeUserRole([FromBody] ChangeRoleDto dto,
+            string userId)
         {
-            var user = await _adminService.changeRole(dto);
+            var user = await _adminService.changeRole(dto, userId);
 
             if (user is null)
             {
-                return NotFound($"User with id {dto.userId} not found");
+                return NotFound($"User with id {userId} not found");
             }
 
             return Ok(user);

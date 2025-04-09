@@ -9,9 +9,11 @@ namespace TicketingSys.Contracts.ServiceInterfaces
     {
         Task<List<ViewUserDto>?> getAllUsers();
 
+        Task<List<ViewUserDto>> queryUsers(UserQueryParamsDto queryParams);
+
         Task<ViewUserDto?> getUserById(string userId);
 
-        Task<ViewUserDto?> changeRole(ChangeRoleDto dto);
+        Task<ViewUserDto?> changeRole(ChangeRoleDto dto, string userId);
 
         Task addDepartment(string name);
 
@@ -20,6 +22,8 @@ namespace TicketingSys.Contracts.ServiceInterfaces
         Task<IEnumerable<ViewTicketCategoryDto>> getAllCategories();
 
         Task<bool> deleteCategoryById(int id);
+
+
 
     }
 }

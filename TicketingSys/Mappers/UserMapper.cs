@@ -9,6 +9,7 @@ namespace TicketingSys.Mappers
         {
             return new ViewUserDto
             {
+                userId = userModel.userId,
                 fullName = userModel.fullName,
                 firstName = userModel.firstName,
                 lastName = userModel.lastName,

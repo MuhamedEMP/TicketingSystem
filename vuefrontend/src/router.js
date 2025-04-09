@@ -7,15 +7,23 @@ import CategoriesByDepartment from './pages/CategoriesByDepartment.vue';
 import Profile from './pages/Profile.vue';
 import Unauthorized from './pages/errorPages/Unauthorized.vue';
 import Forbidden from './pages/errorPages/Forbidden.vue';
-import AdminDashboard from './pages/AdminDashboard.vue';
-
+import InternalServerError from './pages/errorPages/InternalServerError.vue';
+import { compile } from 'vue';
+import { refreshUserRoles } from './utils/userUtils';
+import api from './utils/api';
 
 const routes = [
   { path: '/unauthorized', component: Unauthorized },
   { path: '/forbidden', component: Forbidden },
+  { path: '/internal', component: InternalServerError },
   { path: '/', component: Login },
   { path: '/home', component: Home },
-  { path: '/user/mytickets', component: UserMyTickets },
+  { path: '/user/mytickets', component: UserMyTickets,
+    meta: {
+      requiresAuth: true,
+      roles: ['user'] // if not 403
+    }
+   },
   { path: '/profile', component: Profile },
   {
     path: '/newticket/:departmentId/:categoryId',
@@ -29,7 +37,23 @@ const routes = [
   }, 
   {
     path: '/admin',
-    component: () => import('./pages/AdminDashboard.vue'),
+    component: () => import('./pages/adminPages/AdminDashboard.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: ['Admin'] // if not 403
+    }
+  },
+  {
+    path: '/admin/users',
+    component: () => import('./pages/adminPages/AdminViewUsers.vue'),
+    meta: {
+      requiresAuth: true,
+      roles: ['Admin'] // if not 403
+    }
+  },
+  {
+    path: '/admin/user/:userId',
+    component: () => import('./pages/adminPages/ViewUserProfile.vue'),
     meta: {
       requiresAuth: true,
       roles: ['Admin'] // if not 403
@@ -45,7 +69,7 @@ export const router = createRouter({
 });
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.meta.requiresAuth;
   const requiredRoles = to.meta.roles || [];
 
@@ -54,7 +78,8 @@ router.beforeEach((to, from, next) => {
   const userRoles = storedRoles.map((r) => r.toLowerCase());
 
   if (requiresAuth && !token) {
-    return next('/unauthorized');
+    next('/unauthorized');
+    return;
   }
 
   if (requiresAuth && requiredRoles.length > 0) {
@@ -70,3 +95,5 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
+
+export default router;
