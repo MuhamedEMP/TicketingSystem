@@ -26,14 +26,10 @@
               :key="cat.id"
               class="category-item"
             >
-              <!-- 🔗 Category is a link to submit ticket -->
-              <router-link
-                :to="`/newticket/${dept.id}/${cat.id}`"
-                class="category-link"
-              >
+              
                 {{ cat.name }}
                 <span v-if="cat.description"> - {{ cat.description }}</span>
-              </router-link>
+
             </li>
           </ul>
         </div>

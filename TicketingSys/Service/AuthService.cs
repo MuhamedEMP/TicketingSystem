@@ -19,8 +19,14 @@ namespace TicketingSys.Service
         public async Task<ViewUserDto> addUserAsync(string userId, string email, List<string> roles, string firstName,
             string fullName, string lastName)
         {
-            // default user role
-            if (roles.Count == 0) roles.Add("user");
+            // only admin role should exist in jwt but check just in case someone messes up azure AD
+            if (!roles.Any(r =>
+            r.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("hr", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("it", StringComparison.OrdinalIgnoreCase)))
+                    {
+                roles.Add("user"); // default user role
+            }
 
             var user = new User
             {

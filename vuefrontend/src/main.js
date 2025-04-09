@@ -10,9 +10,15 @@ import { loginRequest, msalConfig } from "./authConfig";
 const msal = new PublicClientApplication(msalConfig);
 
 (async () => {
+  
   await msal.initialize();
-
   const result = await msal.handleRedirectPromise(); 
+
+  
+  const app = createApp(App);
+  app.config.globalProperties.$msal = msal;
+  app.use(router);
+  app.mount("#app");
 
   if (result) {
     msal.setActiveAccount(result.account);
@@ -23,6 +29,13 @@ const msal = new PublicClientApplication(msalConfig);
     });
 
     localStorage.setItem("accessToken", tokenResponse.accessToken);
+    const accessToken = tokenResponse.accessToken;
+
+      await fetch("http://localhost:5172/auth/register", {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
 
     const userResponse = await fetch("http://localhost:5172/shared/myprofile", {
       headers: {
@@ -43,6 +56,7 @@ const msal = new PublicClientApplication(msalConfig);
         return;
       } 
       router.push("/home");
+      
       return;
       // handle HR AND IT ROLES - MAYBE DONT HARDCODE?
     } else {
@@ -50,11 +64,6 @@ const msal = new PublicClientApplication(msalConfig);
       router.push("/home");
     }
   }
-
-  const app = createApp(App);
-  app.config.globalProperties.$msal = msal;
-  app.use(router);
-  app.mount("#app");
 
   if (result && window.location.pathname === "/") {
     router.push("/home");
