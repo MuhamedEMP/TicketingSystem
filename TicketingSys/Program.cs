@@ -119,6 +119,8 @@ builder.Services.AddScoped<IAttachmentService, AttachmentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ISharedService, SharedService>();
 builder.Services.AddScoped<IUserUtils, UserUtils>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 // for custom role policies
 builder.Services.AddScoped<IAuthorizationHandler, RoleInDbHandler>();
 

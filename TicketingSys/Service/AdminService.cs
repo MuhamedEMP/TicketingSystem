@@ -84,7 +84,7 @@ namespace TicketingSys.Service
         public async Task<bool> deleteCategoryById(int id)
         {
             var category = await _context.TicketCategories.FirstOrDefaultAsync(c => c.Id == id);
-            if (category != null) return false;
+            if (category == null) return false;
             _context.Remove(category);
             await _context.SaveChangesAsync();
             return true;    
