@@ -17,7 +17,11 @@ const routes = [
   { path: '/forbidden', component: Forbidden },
   { path: '/internal', component: InternalServerError },
   { path: '/', component: Login },
-  { path: '/home', component: Home },
+  { path: '/home', component: Home,
+    meta: {
+      requiresAuth: true
+    }
+   },
   { path: '/user/mytickets', component: UserMyTickets,
     meta: {
       requiresAuth: true,
@@ -59,7 +63,11 @@ const routes = [
       roles: ['Admin'] // if not 403
     }
   },
-  { path: '/department/:deptId/categories', component: CategoriesByDepartment },
+  { path: '/department/:deptId/categories', component: CategoriesByDepartment,
+    meta: {
+      requiresAuth: true,
+    }
+   },
 ];
 
 

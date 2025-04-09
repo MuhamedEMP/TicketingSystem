@@ -22,10 +22,9 @@
   </nav>
 </template>
 <script setup>
-import { useRouter } from 'vue-router';
 import {  ref } from 'vue';
 import { useRouteFlags } from '../utils/routeUtils';
-
+import router from '../router';
 const { notHome, notMyTickets } = useRouteFlags();
 
 const roles = JSON.parse(localStorage.getItem('roles') || '[]');

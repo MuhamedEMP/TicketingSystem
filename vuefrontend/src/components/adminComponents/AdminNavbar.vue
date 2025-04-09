@@ -22,6 +22,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouteFlags } from '../../utils/routeUtils';
+import router from '../../router';
 
 const { notHome, notMyTickets } = useRouteFlags();
 
