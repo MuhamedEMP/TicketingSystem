@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Security.Claims;
 using TicketingSys.Settings;
 
@@ -20,8 +21,11 @@ namespace TicketingSys.RoleUtils
         {
             var sub = context.User.FindFirst("sub")?.Value;
 
+
             if (string.IsNullOrEmpty(sub))
                 return;
+
+            Console.WriteLine("RoleInDbHandler running for sub: " + sub);
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.userId == sub);
             if (user == null)

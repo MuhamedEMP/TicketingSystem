@@ -4,8 +4,7 @@
   
       <div class="nav-links button-container">
         <router-link v-if="notHome" to="/home" class="button small-button">Home</router-link>
-        <router-link v-if="notMyTickets" to="/user/mytickets" class="button small-button">My Tickets</router-link>
-  
+        <router-link v-if="notAdmin" to="/home" class="button small-button">Admin Panel</router-link>
         <!-- User icon dropdown -->
         <div class="user-menu" @click="toggleDropdown">
           <img src="../../assets/user-icon.png" alt="User" class="user-icon" />
@@ -24,7 +23,7 @@ import { ref } from 'vue';
 import { useRouteFlags } from '../../utils/routeUtils';
 import router from '../../router';
 
-const { notHome, notMyTickets } = useRouteFlags();
+const { notHome, notMyTickets, notAdmin } = useRouteFlags();
 
 const dropdownOpen = ref(false);
 

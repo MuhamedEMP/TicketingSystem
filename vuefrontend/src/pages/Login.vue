@@ -1,19 +1,82 @@
 <template>
-    <div>
-      <h1>Ticketing System (Vue)</h1>
-      <button @click="login">Login with Microsoft</button>
+  <div class="login-page">
+    <div class="login-box">
+      <img class="ms-logo" src="../assets/microsoft-logo.png" alt="Microsoft Logo" />
+      <h1 class="login-heading">Login to Ticketing System</h1>
+      <button class="ms-login-button" @click="login">
+        <span class="ms-button-text">Sign in with Microsoft</span>
+      </button>
     </div>
-  </template>
-  
-  <script setup>
-  import { getCurrentInstance } from "vue";
-  import { loginRequest } from "../authConfig";
-  
-  const { appContext } = getCurrentInstance();
-  const msal = appContext.config.globalProperties.$msal;
-  
-  const login = () => {
-    msal.loginRedirect(loginRequest);
-  };
-  </script>
-  
+  </div>
+</template>
+
+<script setup>
+import { getCurrentInstance } from "vue";
+import { loginRequest } from "../authConfig";
+
+const { appContext } = getCurrentInstance();
+const msal = appContext.config.globalProperties.$msal;
+
+const login = () => {
+  msal.loginRedirect(loginRequest);
+};
+</script>
+
+<style scoped >
+
+.login-page {
+  height: 100vh;
+  background-color: #232020;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.login-box {
+  background-color: #2e2c2c;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: #acacac;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ms-logo {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+}
+
+.login-heading {
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+  color: whitesmoke;
+}
+
+.ms-login-button {
+  background-color: white;
+  color: #232020;
+  font-weight: 600;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.ms-login-button:hover {
+  background-color: #d6d6d6;
+  transform: translateY(-2px);
+}
+
+.ms-button-text {
+  margin-left: 8px;
+}
+
+</style>

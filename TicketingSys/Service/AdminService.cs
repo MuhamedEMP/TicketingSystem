@@ -61,6 +61,7 @@ namespace TicketingSys.Service
         {
             var newCategory = new TicketCategory
             {
+                DepartmentId = category.DepartmentId,
                 Name = category.Name,
                 Description = category.Description
             };
@@ -125,6 +126,15 @@ namespace TicketingSys.Service
             var users = await usersQuery.ToListAsync();
 
             return users.Select(u => u.userModelToDto()).ToList();
+        }
+
+        public async Task<bool> deleteDepartmentById(int id)
+        {
+            var dept = await _context.Departments.FirstOrDefaultAsync(c => c.Id == id);
+            if (dept == null) return false;
+            _context.Remove(dept);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
     }

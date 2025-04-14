@@ -23,11 +23,15 @@ JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure PostgreSQL
+// Configure PostgreSQL and logging
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging() 
+           .LogTo(Console.WriteLine, LogLevel.Information); 
+});
 
-// Add Identity services (if you plan to store additional user data locally)
+//Add Identity services (if you plan to store additional user data locally)
 //builder.Services.AddIdentity<User, IdentityRole>()
 //    .AddEntityFrameworkStores<ApplicationDbContext>()
 //    .AddDefaultTokenProviders();

@@ -23,7 +23,7 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task<bool> deleteCategoryById(int id);
 
-
+        Task<bool> deleteDepartmentById(int id);
 
     }
 }

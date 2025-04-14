@@ -105,5 +105,15 @@ namespace TicketingSys.Controllers
 
             return NotFound();
         }
+
+        [HttpDelete("deletedepartment/{Id}")]
+        public async Task<ActionResult> deleteDepartment(int Id)
+        {
+            var isOk = await _adminService.deleteDepartmentById(Id);
+
+            if (isOk == true) return Ok($"Category with id {Id} deleted.");
+
+            return NotFound();
+        }
     }
 }

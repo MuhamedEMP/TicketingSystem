@@ -31,6 +31,10 @@ namespace TicketingSys.Settings
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.userId); // Index on Id column 
+
+
             // Department
             modelBuilder.Entity<Department>(entity =>
             {

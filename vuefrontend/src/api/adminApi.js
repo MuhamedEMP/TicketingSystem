@@ -20,3 +20,11 @@ export const getAllUsers = () => {
     });
   };
   
+  export const submitDepartment = (deptName) => {
+    return api.post(`/admin/adddepartment/${deptName}`);
+  };
+  
+  export const addNewCategory = async (newCategory) => {
+    const res = await api.post('/admin/addcategory', newCategory)
+    return res.data
+  }

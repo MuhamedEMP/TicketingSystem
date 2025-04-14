@@ -8,16 +8,16 @@ import Profile from './pages/Profile.vue';
 import Unauthorized from './pages/errorPages/Unauthorized.vue';
 import Forbidden from './pages/errorPages/Forbidden.vue';
 import InternalServerError from './pages/errorPages/InternalServerError.vue';
-import { compile } from 'vue';
-import { refreshUserRoles } from './utils/userUtils';
-import api from './utils/api';
+import AddDepartment from './pages/adminPages/AddDepartment.vue';
+import AddCategory from './pages/adminPages/AddCategory.vue';
+import ViewDepartments from './pages/adminPages/ViewDepartments.vue';
 
 const routes = [
   { path: '/unauthorized', component: Unauthorized },
   { path: '/forbidden', component: Forbidden },
   { path: '/internal', component: InternalServerError },
   { path: '/', component: Login },
-  { path: '/home', component: Home,
+  { path: '/home', component: Home, // avaliable to all users will conditionally display data
     meta: {
       requiresAuth: true
     }
@@ -68,6 +68,24 @@ const routes = [
       requiresAuth: true,
     }
    },
+   { path: '/admin/adddepartment', component: AddDepartment,
+    meta: {
+      requiresAuth: true,
+      roles: ['Admin'] // if not 403
+    }
+   },
+   { path: '/admin/departments', component: ViewDepartments,
+    meta: {
+      requiresAuth: true,
+      roles: ['Admin'] // if not 403
+    }
+   },
+   {
+    path: '/department/:deptId/categories/add',
+    component: AddCategory,
+    meta: { requiresAuth: true, roles: ['admin'] }
+  }
+  
 ];
 
 
