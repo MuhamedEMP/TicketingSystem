@@ -4,6 +4,7 @@ using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.UserDtos;
+using TicketingSys.Exceptions;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
 using TicketingSys.Settings;
@@ -49,6 +50,10 @@ namespace TicketingSys.Service
 
         public async Task addDepartment(string name)
         {
+            var exists = await _context.Departments.FirstOrDefaultAsync(d=> d.Name == name);
+            if (exists != null)
+                throw new UniqueConstraintFailedException("Can not create two departments with same name");
+
             var newDepartment = new Department
             {
                 Name = name,
@@ -73,23 +78,13 @@ namespace TicketingSys.Service
         {
             var categories = await _context.TicketCategories
                 .Include(c => c.Department)
-                .ToListAsync(); // ✅ this must stay — executes the SQL
+                .ToListAsync();
 
             return categories
                 .Where(c => c != null && c.Department != null)
-                .Select(c => c.modelToViewDto()); // ✅ no ToList() here
+                .Select(c => c.modelToViewDto()); 
         }
 
-
-
-        public async Task<bool> deleteCategoryById(int id)
-        {
-            var category = await _context.TicketCategories.FirstOrDefaultAsync(c => c.Id == id);
-            if (category == null) return false;
-            _context.Remove(category);
-            await _context.SaveChangesAsync();
-            return true;    
-        }
 
         public async Task<List<ViewUserDto>> queryUsers(UserQueryParamsDto queryParams)
         {
@@ -128,10 +123,32 @@ namespace TicketingSys.Service
             return users.Select(u => u.userModelToDto()).ToList();
         }
 
+
+        public async Task<bool> deleteCategoryById(int id)
+        {
+            var category = await _context.TicketCategories.FirstOrDefaultAsync(c => c.Id == id);
+            if (category == null) return false;
+
+            bool isReferenced = await _context.Tickets.AnyAsync(t => t.CategoryId == id);
+
+            if (isReferenced)
+                throw new CantDeleteCategoryException("Cannot delete category with assigned tickets.");
+
+            _context.Remove(category);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
         public async Task<bool> deleteDepartmentById(int id)
         {
             var dept = await _context.Departments.FirstOrDefaultAsync(c => c.Id == id);
             if (dept == null) return false;
+
+            var isReferenced = await _context.Tickets.AnyAsync(t => t.DepartmentId == id);
+            if (isReferenced)
+                throw new CantDeleteDepartmentException();
+            
             _context.Remove(dept);
             await _context.SaveChangesAsync();
             return true;

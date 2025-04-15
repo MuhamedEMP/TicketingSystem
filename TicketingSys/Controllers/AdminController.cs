@@ -6,6 +6,7 @@ using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.DepartmentDtos;
 using TicketingSys.Dtos.UserDtos;
+using TicketingSys.Exceptions;
 using TicketingSys.Models;
 
 namespace TicketingSys.Controllers
@@ -80,11 +81,18 @@ namespace TicketingSys.Controllers
         [HttpPost("adddepartment/{deptName}")]
         public async Task<ActionResult> addDepartment(string deptName)
         {
-            string lowercase = deptName.ToLower();
+            try
+            {
+                string lowercase = deptName.ToLower();
 
-            await _adminService.addDepartment(lowercase);
+                await _adminService.addDepartment(lowercase);
 
-            return Ok("Created department with name "+lowercase);
+                return Ok("Created department with name " + lowercase);
+            }
+            catch (UniqueConstraintFailedException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
 
 
@@ -99,21 +107,36 @@ namespace TicketingSys.Controllers
         [HttpDelete("deletecategory/{Id}")]
         public async Task<ActionResult> deleteCategory(int Id)
         {
-            var isOk = await _adminService.deleteCategoryById(Id);
+            try
+            {
+                var isOk = await _adminService.deleteCategoryById(Id);
 
-            if(isOk == true) return Ok($"Category with id {Id} deleted.");
+                if (isOk == true) return Ok($"Category with id {Id} deleted.");
 
-            return NotFound();
+                return NotFound();
+
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message); // 409 code
+            }
         }
 
         [HttpDelete("deletedepartment/{Id}")]
         public async Task<ActionResult> deleteDepartment(int Id)
         {
-            var isOk = await _adminService.deleteDepartmentById(Id);
+            try
+            {
+                var isOk = await _adminService.deleteDepartmentById(Id);
 
-            if (isOk == true) return Ok($"Category with id {Id} deleted.");
+                if (isOk == true) return Ok($"Department with id {Id} deleted.");
 
-            return NotFound();
+                return NotFound();
+            }
+            catch (CantDeleteDepartmentException ex)
+            {
+                return Conflict(ex.Message); // 409 code
+            }
         }
     }
 }

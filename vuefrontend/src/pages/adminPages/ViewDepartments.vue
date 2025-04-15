@@ -103,7 +103,7 @@ const deleteDepartment = async (deptId) => {
   } catch (err) {
     console.error('❌ Delete failed:', err)
     const userMsg = err.response?.status === 400 || err.response?.status === 409
-      ? 'Cannot delete: Department has linked tickets.'
+      ? 'Cannot delete: Department has linked categories.'
       : 'Failed to delete department.'
 
     errorMessageByDept.value[deptId] = userMsg

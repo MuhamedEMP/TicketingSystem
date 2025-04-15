@@ -35,22 +35,29 @@
   const error = ref('');
   
   const submit = async () => {
-  message.value = '';
-  error.value = '';
+  message.value = ''
+  error.value = ''
 
   if (!deptName.value.trim()) {
-    error.value = 'Please enter a department name.';
-    return;
+    error.value = 'Please enter a department name.'
+    return
   }
 
   try {
-    const response = await submitDepartment(deptName.value);
-    message.value = response.data;
-    deptName.value = '';
+    const response = await submitDepartment(deptName.value)
+    message.value = response.data
+    deptName.value = ''
   } catch (err) {
-    error.value = err.response?.data || 'Failed to add department.';
+    if (err.response?.status === 409) {
+      // If API sent a specific message → show it
+      error.value = err.response?.data || 'Department already exists or cannot be added.'
+    } else {
+      // Fallback for other errors
+      error.value = 'Failed to add department.'
+    }
   }
-};
+}
+
 
   </script>
   <style scoped>

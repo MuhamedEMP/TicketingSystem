@@ -59,14 +59,17 @@
   if (!confirm('Are you sure you want to delete this category?')) return
 
   try {
-    await api.delete(`/admin/deletecategory/${categoryId}`)
+  await api.delete(`/admin/deletecategory/${categoryId}`)
 
-    categories.value = categories.value.filter(cat => cat.id !== categoryId)
-    console.log(`Category ${categoryId} deleted`)
-  } catch (err) {
-    console.error('Failed to delete category:', err)
+  categories.value = categories.value.filter(cat => cat.id !== categoryId)
+} catch (err) {
+  if (err.response?.status === 409) {
+    alert('❗ Cannot delete: This category is used by existing tickets.')
+  } else {
     alert('Failed to delete category.')
   }
+}
+
 }
 
   
