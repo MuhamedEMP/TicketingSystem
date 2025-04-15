@@ -10,10 +10,13 @@ using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Middleware;
 using TicketingSys.Models;
-using TicketingSys.RoleUtils;
+using TicketingSys.Redis;
+using TicketingSys.RoleHandling.Policies;
+using TicketingSys.RoleHandling.RoleHandlers;
 using TicketingSys.Service;
 using TicketingSys.Settings;
 using TicketingSys.Util;
+using TicketingSys.Utils;
 
 // this is so .net doesnt map jwt claims to long urls 
 Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -74,47 +77,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
+});
+
 
 builder.Services.AddAuthorization(options =>
 {
-    // jwt claim based policies
-    options.AddPolicy("ManagerOnly", policy =>
-        policy.RequireClaim("roles", "manager"));
+    options.AddPolicy("DepartmentUserOnly", policy =>
+        policy.Requirements.Add(new DeptUserOnlyRequirement()));
+
+    options.AddPolicy("AdminOrDepartmentUser", policy =>
+        policy.Requirements.Add(new AdminOrDeptUserRequirement()));
 
     options.AddPolicy("AdminOnly", policy =>
-        policy.RequireClaim("roles", "admin"));
+        policy.Requirements.Add(new AdminOnlyRequirement()));
 
-    // policies which check role from db
-    options.AddPolicy("AdminFromDb", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("admin")));
+    options.AddPolicy("RegularUserOnly", policy =>
+        policy.Requirements.Add(new RegularUserOnlyRequirement()));
 
-     options.AddPolicy("HrFromDb", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("hr")));
-
-     options.AddPolicy("ItFromDb", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("it")));
-
-    options.AddPolicy("UserFromDb", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("user")));
-
-    // combined policies
-    options.AddPolicy("AdminHrItFromDb", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("admin", "hr", "it")));
-
-    options.AddPolicy("HrOrIt", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("hr", "it")));
-
-    options.AddPolicy("HrOrAdmin", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("hr", "admin")));
-
-    options.AddPolicy("ItOrAdmin", policy =>
-       policy.Requirements.Add(new RoleInDbRequirement("it", "admin")));
-
-    options.AddPolicy("HrOrIT", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("hr", "it")));
-
-    options.AddPolicy("AllRoles", policy =>
-        policy.Requirements.Add(new RoleInDbRequirement("hr", "it","admin", "user")));
 });
 
 
@@ -124,9 +106,16 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ISharedService, SharedService>();
 builder.Services.AddScoped<IUserUtils, UserUtils>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IRedisUtils, RedisUtils>();
+
+// redis service
+builder.Services.AddScoped<IUserAccessCacheService, UserAccessCacheService>();
 
 // for custom role policies
-builder.Services.AddScoped<IAuthorizationHandler, RoleInDbHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, AdminOnlyHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, AdminOrDeptUserHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, RegularUserOnlyHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, DeptUserOnlyHandler>();
 
 
 builder.Services.AddCors(options =>

@@ -13,7 +13,7 @@ namespace TicketingSys.Controllers
 {
     [Route("admin")]
     [ApiController]
-    [Authorize(Policy ="AdminFromDb")]
+    [Authorize(Policy ="AdminOnly")]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;

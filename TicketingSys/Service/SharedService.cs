@@ -41,10 +41,11 @@ namespace TicketingSys.Service
             var referencedTicket = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == dto.TicketId);
             var departmentName = referencedTicket.Department.Name.ToLower();
 
-            var userHasAccess = currentUserRoles
-                .Any(role => role.Equals(departmentName, StringComparison.OrdinalIgnoreCase));
+            // check if this works
+            var userHasAccess = await _context.UserDepartmentAccess
+                .FirstOrDefaultAsync(a => a.UserId == userId && a.Department.Name.ToLower() == departmentName);
 
-            if (!userHasAccess)
+            if (userHasAccess is null)
                 return null;
 
             if (referencedTicket.Status != dto.Status)

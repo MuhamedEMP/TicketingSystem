@@ -8,47 +8,45 @@ namespace TicketingSys.Controllers
     [ApiController]
     [Route("Test")]
     public class TestPolicyController : ControllerBase
-    {
+    {   // 🔓 Any authenticated user
+        [Authorize]
+        [HttpGet("authenticated")]
+        public IActionResult AuthenticatedOnly()
+        {
+            return Ok("✅ You are authenticated.");
+        }
 
-        [Authorize(Policy = "AdminFromDb")]
+        // 🔐 Only Admin
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("admin")]
-        public IActionResult Admin() => Ok("Admin access");
+        public IActionResult AdminOnly()
+        {
+            return Ok("✅ You are an Admin.");
+        }
 
-        [Authorize(Policy = "HrFromDb")]
-        [HttpGet("hr")]
-        public IActionResult Hr() => Ok("HR access");
+        // 👥 Only non-admin department users
+        [Authorize(Policy = "DepartmentUserOnly")]
+        [HttpGet("department-user")]
+        public IActionResult DepartmentUserOnly()
+        {
+            return Ok("✅ You are a department-level user (non-admin).");
+        }
 
-        [Authorize(Policy = "ItFromDb")]
-        [HttpGet("it")]
-        public IActionResult It() => Ok("IT access");
+        // 🧑‍💻 Regular users with no department access
+        [Authorize(Policy = "RegularUserOnly")]
+        [HttpGet("regular-user")]
+        public IActionResult RegularUserOnly()
+        {
+            return Ok("✅ You are a regular user (no dept, not admin).");
+        }
 
-        [Authorize(Policy = "UserFromDb")]
-        [HttpGet("user")]
-        public IActionResult User() => Ok("User access");
-
-        [Authorize(Policy = "AdminHrItFromDb")]
-        [HttpGet("adminhrit")]
-        public IActionResult AdminHrIt() => Ok("Admin/HR/IT access");
-
-        [Authorize(Policy = "HrOrIt")]
-        [HttpGet("hrorit")]
-        public IActionResult HrOrIt() => Ok("HR or IT access");
-
-        [Authorize(Policy = "HrOrAdmin")]
-        [HttpGet("hroradmin")]
-        public IActionResult HrOrAdmin() => Ok("HR or Admin access");
-
-        [Authorize(Policy = "ItOrAdmin")]
-        [HttpGet("itoradmin")]
-        public IActionResult ItOrAdmin() => Ok("IT or Admin access");
-
-        [Authorize(Policy = "HrOrIT")]
-        [HttpGet("hrorit_duplicate")]
-        public IActionResult HrOrItDuplicate() => Ok("HR or IT (duplicate) access");
-
-        [Authorize(Policy = "AllRoles")]
-        [HttpGet("allroles")]
-        public IActionResult AllRoles() => Ok("All roles access");
+        // 🔄 Either Admin or Department-level user
+        [Authorize(Policy = "AdminOrDepartmentUser")]
+        [HttpGet("admin-or-department")]
+        public IActionResult AdminOrDepartmentUser()
+        {
+            return Ok("✅ You are an Admin or a department-level user.");
+        }
     }
 #endif
 }

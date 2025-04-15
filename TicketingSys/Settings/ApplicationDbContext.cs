@@ -14,8 +14,8 @@ namespace TicketingSys.Settings
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<TicketAttachment> TicketAttachments { get; set; }
         public DbSet<TicketCategory> TicketCategories { get; set; }
-
         public DbSet<Department> Departments { get; set; }
+        public DbSet<UserDepartmentAccess> UserDepartmentAccess { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions)
        : base(dbContextOptions)
@@ -23,10 +23,6 @@ namespace TicketingSys.Settings
         }
 
 
-
-        // reason for this is having two FK relationships in Ticket model
-        // referencing the User table ( SubmittedBy and AssignedTo )
-        // could cause problems -- double check this
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -98,9 +94,9 @@ namespace TicketingSys.Settings
                 entity.Property(t => t.Urgency).IsRequired();
 
                 entity.HasOne(t => t.SubmittedBy)
-              .WithMany() 
-              .HasForeignKey(t => t.SubmittedById)
-              .OnDelete(DeleteBehavior.Restrict);
+                  .WithMany() 
+                  .HasForeignKey(t => t.SubmittedById)
+                  .OnDelete(DeleteBehavior.Restrict);
 
                 // Relationship: Ticket -> AssignedTo (user to which ticket is assigned)
                 entity.HasOne(t => t.AssignedTo)
@@ -154,6 +150,26 @@ namespace TicketingSys.Settings
                           .HasForeignKey(tc => tc.DepartmentId)
                           .OnDelete(DeleteBehavior.Cascade);
                 });
+
+                modelBuilder.Entity<UserDepartmentAccess>(entity =>
+                {
+                    entity.HasKey(uda => uda.Id);
+
+                    entity.HasOne(uda => uda.User)
+                          .WithMany(u => u.DepartmentAccesses)
+                          .HasForeignKey(uda => uda.UserId)
+                          .OnDelete(DeleteBehavior.Cascade);
+
+                    entity.HasOne(uda => uda.Department)
+                          .WithMany()
+                          .HasForeignKey(uda => uda.DepartmentId)
+                          .OnDelete(DeleteBehavior.Cascade);
+
+                    entity.HasIndex(uda => new 
+                        { uda.UserId, uda.DepartmentId }).IsUnique(); // prevent duplicate access
+                });
+
+
 
             });
             

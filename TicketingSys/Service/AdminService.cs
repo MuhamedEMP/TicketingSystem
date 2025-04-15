@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
+using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.DepartmentDtos;
@@ -7,6 +8,7 @@ using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Exceptions;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
+using TicketingSys.Redis;
 using TicketingSys.Settings;
 
 namespace TicketingSys.Service
@@ -14,10 +16,12 @@ namespace TicketingSys.Service
     public class AdminService : IAdminService
     {
         ApplicationDbContext _context;
+        IUserAccessCacheService _redisService;
 
-        public AdminService(ApplicationDbContext context)
+        public AdminService(ApplicationDbContext context, IUserAccessCacheService redisService)
         {
             _context = context;
+            _redisService = redisService;
         }
 
 
@@ -36,17 +40,36 @@ namespace TicketingSys.Service
 
         public async Task<ViewUserDto?> changeRole(ChangeRoleDto dto, string userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.userId == userId);
+            var user = await _context.Users.
+                Include(u=> u.DepartmentAccesses).
+                FirstOrDefaultAsync(u => u.userId == userId);
+
             if (user == null) return null;
 
-            var roles = dto.roles.Select(r => r.ToLower()).ToList();
-            
-            user.roles = roles;
+            if (dto.isAdmin is not null) user.IsAdmin = dto.isAdmin.Value;
+
+            var currentDepartmentAccesses = await _context.UserDepartmentAccess.AllAsync(da => da.UserId == userId);
+
+            if (dto.DepartmentIds is not null)
+            {
+                _context.UserDepartmentAccess.RemoveRange(user.DepartmentAccesses);
+
+                var newAccesses = dto.DepartmentIds.Select(deptId => new UserDepartmentAccess
+                {
+                    UserId = userId,
+                    DepartmentId = deptId
+                });
+
+                await _context.UserDepartmentAccess.AddRangeAsync(newAccesses);
+            }
 
             await _context.SaveChangesAsync();
 
+            await _redisService.InvalidateUserAccessAsync(userId);
+
             return user.userModelToDto();
         }
+
 
         public async Task addDepartment(string name)
         {
@@ -111,12 +134,6 @@ namespace TicketingSys.Service
                 usersQuery = usersQuery.Where(u => u.email.ToLower().Contains(queryParams.email.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(queryParams.role))
-            {
-                var roleFilter = queryParams.role.ToLower();
-                usersQuery = usersQuery.Where(u =>
-                    u.roles.Any(r => r.ToLower().Contains(roleFilter)));
-            }
 
             var users = await usersQuery.ToListAsync();
 
