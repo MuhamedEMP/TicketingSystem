@@ -10,8 +10,8 @@ namespace TicketingSys.RoleHandling.RoleHandlers
     public class AdminOrDeptUserHandler : BaseRoleHandler<AdminOrDeptUserRequirement>
     {
 
-        public AdminOrDeptUserHandler(ApplicationDbContext context, IRedisUtils redisUtils)
-        : base(context, redisUtils) { }
+        public AdminOrDeptUserHandler(ApplicationDbContext context, IRedisUtils redisUtils, ILogger<AdminOrDeptUserHandler> logger)
+        : base(context, redisUtils, logger) { }
 
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, AdminOrDeptUserRequirement requirement)

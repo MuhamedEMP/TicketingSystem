@@ -10,8 +10,8 @@ namespace TicketingSys.RoleHandling.RoleHandlers
 {
     public class RegularUserOnlyHandler : BaseRoleHandler<RegularUserOnlyRequirement>
     {
-        public RegularUserOnlyHandler(ApplicationDbContext context, IRedisUtils redisUtils)
-        : base(context, redisUtils) { }
+        public RegularUserOnlyHandler(ApplicationDbContext context, IRedisUtils redisUtils, ILogger<RegularUserOnlyHandler> logger)
+        : base(context, redisUtils, logger) { }
 
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, RegularUserOnlyRequirement requirement)

@@ -165,7 +165,7 @@ namespace TicketingSys.Settings
                           .HasForeignKey(uda => uda.DepartmentId)
                           .OnDelete(DeleteBehavior.Cascade);
 
-                    entity.HasIndex(uda => new 
+                    entity.HasIndex(uda => new  // add index to userid query and userid + deptid query
                         { uda.UserId, uda.DepartmentId }).IsUnique(); // prevent duplicate access
                 });
 

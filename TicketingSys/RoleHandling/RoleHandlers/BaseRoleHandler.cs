@@ -9,11 +9,13 @@ namespace TicketingSys.RoleHandling.RoleHandlers
     {
         protected readonly ApplicationDbContext _context;
         protected readonly IRedisUtils _redisUtils;
+        protected readonly ILogger _logger;
 
-        protected BaseRoleHandler(ApplicationDbContext context, IRedisUtils redisUtils)
+        protected BaseRoleHandler(ApplicationDbContext context, IRedisUtils redisUtils, ILogger logger)
         {
             _context = context;
             _redisUtils = redisUtils;
+            _logger = logger;
         }
 
     }

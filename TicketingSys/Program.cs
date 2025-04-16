@@ -82,6 +82,11 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
 });
 
+// for custom role policies
+builder.Services.AddScoped<IAuthorizationHandler, AdminOnlyHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, AdminOrDeptUserHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, RegularUserOnlyHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, DeptUserOnlyHandler>();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -111,12 +116,8 @@ builder.Services.AddScoped<IRedisUtils, RedisUtils>();
 // redis service
 builder.Services.AddScoped<IUserAccessCacheService, UserAccessCacheService>();
 
-// for custom role policies
-builder.Services.AddScoped<IAuthorizationHandler, AdminOnlyHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, AdminOrDeptUserHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, RegularUserOnlyHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, DeptUserOnlyHandler>();
-
+// write roles from postgres to redis and try again on 403
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, RefreshRedisOn403>();
 
 builder.Services.AddCors(options =>
 {

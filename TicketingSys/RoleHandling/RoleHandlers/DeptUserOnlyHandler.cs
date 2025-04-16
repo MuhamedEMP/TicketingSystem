@@ -10,8 +10,8 @@ namespace TicketingSys.RoleHandling.RoleHandlers
 {
     public class DeptUserOnlyHandler: BaseRoleHandler<DeptUserOnlyRequirement>
     {
-        public DeptUserOnlyHandler(ApplicationDbContext context, IRedisUtils redisUtils)
-        : base(context, redisUtils) { }
+        public DeptUserOnlyHandler(ApplicationDbContext context, IRedisUtils redisUtils, ILogger<DeptUserOnlyHandler> logger)
+        : base(context, redisUtils, logger) { }
 
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, DeptUserOnlyRequirement requirement)

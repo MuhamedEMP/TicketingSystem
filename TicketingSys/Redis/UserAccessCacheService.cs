@@ -6,19 +6,28 @@ namespace TicketingSys.Redis
     public class UserAccessCacheService: IUserAccessCacheService
     {
         private readonly IDistributedCache _cache;
+        private readonly ILogger _logger;
 
-        public UserAccessCacheService(IDistributedCache cache)
+        public UserAccessCacheService(IDistributedCache cache, ILogger<UserAccessCache> logger)
         {
             _cache = cache;
+            _logger = logger;
         }
 
         public async Task<UserAccessCache?> GetUserAccessAsync(string userId)
         {
             var data = await _cache.GetStringAsync($"user-access:{userId}");
             if (string.IsNullOrEmpty(data))
+            {
+                _logger.LogInformation("USER-ACCESS:USERID IS NULL OR EMPTY");
                 return null;
+            }
 
-            return JsonSerializer.Deserialize<UserAccessCache>(data);
+            var dataSerialized = JsonSerializer.Deserialize<UserAccessCache>(data);
+
+            _logger.LogInformation($"DATA IN GetUserAccessAsync {dataSerialized}");
+
+            return dataSerialized;
         }
 
         public async Task SetUserAccessAsync(string userId, bool isAdmin, bool hasDepartmentAccess)
