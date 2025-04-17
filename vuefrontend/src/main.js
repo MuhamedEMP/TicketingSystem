@@ -10,11 +10,9 @@ import { loginRequest, msalConfig } from "./authConfig";
 const msal = new PublicClientApplication(msalConfig);
 
 (async () => {
-  
   await msal.initialize();
   const result = await msal.handleRedirectPromise(); 
 
-  
   const app = createApp(App);
   app.config.globalProperties.$msal = msal;
   app.use(router);
@@ -31,37 +29,62 @@ const msal = new PublicClientApplication(msalConfig);
     localStorage.setItem("accessToken", tokenResponse.accessToken);
     const accessToken = tokenResponse.accessToken;
 
-      await fetch("http://localhost:5172/auth/register", {
+    // Call /auth/register after login
+    await fetch("http://localhost:5172/auth/register", {
       headers: {
         "Authorization": `Bearer ${accessToken}`
       }
     });
 
+    // Fetch current user profile
     const userResponse = await fetch("http://localhost:5172/shared/myprofile", {
       headers: {
         Authorization: `Bearer ${tokenResponse.accessToken}`,
       },
     });
 
-    if (userResponse.ok){
+    if (userResponse.ok) {
       const user = await userResponse.json();
-      localStorage.setItem("roles", JSON.stringify(user.roles));
+
+      // 🔐 Save info to localStorage for rendering
+      localStorage.setItem("userId", user.userId);
       localStorage.setItem("userFullName", user.fullName);
+      localStorage.setItem("isAdmin", JSON.stringify(user.isAdmin));
+      localStorage.setItem("accessibleDepartments", JSON.stringify(user.accessibleDepartmentDtos || []));
 
-      const roles = user.roles?.map(r => r.toLowerCase());
+      // Mirror backend policy logic:
+      const hasDeptAccess = user.accessibleDepartmentDtos?.length > 0;
+      const grantedPolicies = [];
 
-      if (roles.includes("admin")) {
- // these role based checks work
+      // AdminOnly handler logic
+      if (user.isAdmin) {
+        grantedPolicies.push("AdminOnly");
+      }
+
+      // AdminOrDepartmentUser handler logic
+      if (user.isAdmin || hasDeptAccess) {
+        grantedPolicies.push("AdminOrDepartmentUser");
+      }
+
+      // DepartmentUserOnly handler logic
+      if (!user.isAdmin && hasDeptAccess) {
+        grantedPolicies.push("DepartmentUserOnly");
+      }
+
+      // RegularUserOnly handler logic
+      if (!user.isAdmin && !hasDeptAccess) {
+        grantedPolicies.push("RegularUserOnly");
+      }
+
+localStorage.setItem("grantedPolicies", JSON.stringify(grantedPolicies));
+      // ✅ Route to proper dashboard
+      if (grantedPolicies.includes("AdminOnly")) {
         router.push("/profile");
         return;
-      } 
+      }
+
       router.push("/home");
-      
       return;
-      // handle HR AND IT ROLES - MAYBE DONT HARDCODE?
-    } else {
-      console.error("Failed to fetch user info");
-      router.push("/home");
     }
   }
 

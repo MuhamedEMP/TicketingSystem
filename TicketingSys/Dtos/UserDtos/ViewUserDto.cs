@@ -19,5 +19,7 @@ namespace TicketingSys.Dtos.UserDtos
 
         public bool isAdmin { get; set; }   
 
+        public string? roleType { get; set; }
+
     }
 }

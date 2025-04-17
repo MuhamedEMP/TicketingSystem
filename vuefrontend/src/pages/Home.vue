@@ -3,7 +3,8 @@
     <UserNavbar />
     <div class="overlay"></div>
 
-    <div class="home-page">
+    <!-- 👤 Regular Users (no admin or department access) -->
+    <div v-if="hasPolicy('RegularUserOnly')" class="home-page">
       <h1>Send New Ticket</h1>
 
       <div v-if="departments.length && categories.length">
@@ -12,7 +13,6 @@
           :key="dept.id"
           class="department-block"
         >
-          <!-- 🔗 Department name is a link -->
           <router-link
             :to="`/department/${dept.id}/categories`"
             class="department-link"
@@ -26,10 +26,8 @@
               :key="cat.id"
               class="category-item"
             >
-              
-                {{ cat.name }}
-                <span v-if="cat.description"> - {{ cat.description }}</span>
-
+              {{ cat.name }}
+              <span v-if="cat.description"> - {{ cat.description }}</span>
             </li>
           </ul>
         </div>
@@ -37,8 +35,30 @@
 
       <p v-else>Loading departments and categories...</p>
     </div>
+
+    <!-- 🏢 Department Users -->
+    <div v-if="hasPolicy('DepartmentUserOnly')" class="home-page">
+      <h1>Welcome, Department Staff</h1>
+      <p>You can view and respond to tickets assigned to your department.</p>
+      <router-link to="/sharedtickets" class="button">Go to Department Tickets</router-link>
+    </div>
+
+    <!-- 🛠️ Admin Users -->
+    <div v-if="hasPolicy('AdminOnly')" class="home-page">
+      <h1>Welcome, Admin</h1>
+      <p>You have access to full system controls and user management.</p>
+      <router-link to="/admin" class="button">Go to Admin Panel</router-link>
+    </div>
+
+    <!-- 🧑‍💼 Admin OR Dept User -->
+    <div v-if="hasPolicy('AdminOrDepartmentUser')" class="home-page">
+      <h2>Shared Ticket View</h2>
+      <p>You have access to tickets relevant to your departments or all tickets if you're an admin.</p>
+      <router-link to="/sharedtickets" class="button">View Tickets</router-link>
+    </div>
   </div>
 </template>
+
 
 
 <script setup>
@@ -46,6 +66,7 @@ import UserNavbar from '../components/UserNavbar.vue';
 import { ref, onMounted } from 'vue';
 import { getAllDepartments } from '../api/departmentApi';
 import { getAllCategories } from '../api/categoryApi';
+import { hasPolicy } from '../utils/hasPolicy';
 
 const departments = ref([]);
 const categories = ref([]);
@@ -65,6 +86,22 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+
+.button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+.button:hover {
+  background-color: #36966e;
+}
+
 .home-page {
   padding: 2rem;
   color: #eee;

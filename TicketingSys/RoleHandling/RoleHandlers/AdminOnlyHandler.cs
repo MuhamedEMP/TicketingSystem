@@ -21,8 +21,11 @@ namespace TicketingSys.RoleHandling.RoleHandlers
             _logger.LogWarning("ENTERED ADMIN HANDLER");
 
             var userId = context.User.FindFirst("sub")?.Value;
-            if (string.IsNullOrEmpty(userId)) return;
-
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.LogWarning("USERID IS NULL");
+                return;
+            }
             var access = await _redisUtils.GetOrFetchAccess(userId);
             if (access == null) return;
 

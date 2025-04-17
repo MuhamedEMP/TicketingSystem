@@ -25,13 +25,11 @@ namespace TicketingSys.Utils
             if (access != null)
             {
                 _logger.LogWarning("ACCESS FROM REDIS IS NOT NULL: isAdmin = {IsAdmin}, hasDept = {HasDept}",
-                    access.IsAdmin, access.HasDepartmentAccess);
+                 access.IsAdmin, access.HasDepartmentAccess);
 
                 return access;
             }
                 
-
-            _logger.LogWarning("ACCESS IS NULL");
             var user = await _context.Users.Include(u => u.DepartmentAccesses)
                 .FirstOrDefaultAsync(u => u.userId == userId);
             if (user is null) return null;

@@ -95,31 +95,37 @@ export const router = createRouter({
 });
 
 
-router.beforeEach(async (to, from, next) => {
-  const requiresAuth = to.meta.requiresAuth;
-  const requiredRoles = to.meta.roles || [];
+// router.beforeEach((to, from, next) => {
+//   const requiresAuth = to.meta.requiresAuth;
+//   const requiredRoles = to.meta.roles || [];
 
-  const token = localStorage.getItem('accessToken');
-  const storedRoles = JSON.parse(localStorage.getItem('roles') || '[]');
-  const userRoles = storedRoles.map((r) => r.toLowerCase());
+//   const token = localStorage.getItem('accessToken');
+//   const rolesReady = localStorage.getItem('rolesReady') === 'true';
 
-  if (requiresAuth && !token) {
-    next('/unauthorized');
-    return;
-  }
+//   const storedRolesRaw = localStorage.getItem('roles');
+//   let storedRoles = [];
 
-  if (requiresAuth && requiredRoles.length > 0) {
-    const hasAccess = requiredRoles.some((role) =>
-      userRoles.includes(role.toLowerCase())
-    );
+//   try {
+//     storedRoles = storedRolesRaw ? JSON.parse(storedRolesRaw) : [];
+//   } catch {
+//     storedRoles = [];
+//   }
 
-    if (!hasAccess) {
-      return next('/forbidden');
-    }
-  }
+//   const userRoles = Array.isArray(storedRoles)
+//     ? storedRoles.map((r) => r.toLowerCase())
+//     : [];
 
-  next();
-});
+//   if (requiresAuth && !token) return next('/unauthorized');
+//   if (requiresAuth && requiredRoles.length > 0 && rolesReady) {
+//     const hasAccess = requiredRoles.some((role) =>
+//       userRoles.includes(role.toLowerCase())
+//     );
+//     if (!hasAccess) return next('/forbidden');
+//   }
+
+//   next();
+// });
+
 
 
 export default router;

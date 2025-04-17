@@ -66,6 +66,11 @@ namespace TicketingSys.Controllers
         public async Task<ActionResult<ViewUserDto>> changeUserRole([FromBody] ChangeRoleDto dto,
             string userId)
         {
+            if (dto.isAdmin is null && dto.DepartmentIds is null)
+            {
+                return BadRequest("No valid changes provided");
+            }
+
             var user = await _adminService.changeRole(dto, userId);
 
             if (user is null)

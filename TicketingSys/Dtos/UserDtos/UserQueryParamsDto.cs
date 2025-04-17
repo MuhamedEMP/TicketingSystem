@@ -10,5 +10,8 @@
 
         public string? email { get; set; }
 
+        public bool? isAdmin {  get; set; }
+        public bool? hasDepartments { get; set; }
+
     }
 }
