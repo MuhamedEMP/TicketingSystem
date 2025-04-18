@@ -10,6 +10,8 @@
 
         public string? email { get; set; }
 
-        public string? role { get; set; }
+        public bool? isAdmin {  get; set; }
+        public bool? hasDepartments { get; set; }
+
     }
 }

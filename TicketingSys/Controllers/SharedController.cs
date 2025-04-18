@@ -17,7 +17,7 @@ using TicketingSys.Settings;
 namespace TicketingSys.Controllers
 {
     // NOTE:
-    // routes that can be used by multiple user roles are here (admin, hr and it)
+    // routes that can be used by multiple user roles are here 
     [Route("shared")]
     [ApiController]
     public class SharedController : ControllerBase
@@ -28,7 +28,7 @@ namespace TicketingSys.Controllers
         private readonly ApplicationDbContext _context;
 
         public SharedController(ISharedService sharedService, IUserUtils userUtils,
-            IAttachmentService attachmentService, ApplicationDbContext context)
+               IAttachmentService attachmentService, ApplicationDbContext context)
         {
             _sharedService = sharedService;
             _userUtils = userUtils;
@@ -36,7 +36,8 @@ namespace TicketingSys.Controllers
             _context = context;
         }
 
-        [Authorize(Policy ="AllRoles")]
+
+        [Authorize]
         [HttpGet("myprofile")]
         public async Task<ActionResult<ViewUserDto>> myProfile()
         {
@@ -53,7 +54,7 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy = "AdminHrItFromDb")]
+        [Authorize(Policy = "AdminOrDepartmentUser")]
         [HttpGet("profile/{userId}")]
         public async Task<ActionResult<ViewUserDto>> getProfileById(string userId)
         {
@@ -68,7 +69,7 @@ namespace TicketingSys.Controllers
         }
 
         // returns all tickets from the users department
-        [Authorize(Policy = "HrOrIt")]
+        [Authorize(Policy = "DepartmentUserOnly")]
         [HttpGet("alltickets")] 
         public async Task<ActionResult<List<ViewTicketDto>>> getAllTickets()
         {
@@ -83,7 +84,7 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy = "HrOrIt")]
+        [Authorize(Policy = "DepartmentUserOnly")]
         [HttpGet("querytickets")]
         public async Task<ActionResult<List<ViewTicketDto>>> GetAllTicketsWithQuery([FromQuery] SharedTicketQueryParamsDto query)
         {
@@ -99,12 +100,10 @@ namespace TicketingSys.Controllers
 
 
 
-        [Authorize(Policy = "AdminHrItFromDb")]
+        [Authorize(Policy = "AdminOrDepartmentUser")]
         [HttpGet("ticket/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto?>> getTicketById(int ticketId)
         {
-            var currentUserRoles = await _userUtils.getUserRoles();
-
             var ticket = await _sharedService.getTicketById(ticketId);
 
             if (ticket == null)
@@ -112,27 +111,18 @@ namespace TicketingSys.Controllers
 
             var ticketDept = ticket.Department.Name.ToLowerInvariant();
 
-            bool isAdmin = currentUserRoles.Contains("admin");
-            bool isInSameDept = ticketDept != null && currentUserRoles.Contains(ticketDept);
-
-            if (!isAdmin && !isInSameDept)
-                return Forbid();
 
             return Ok(ticket.modelToViewDto());
         }
 
 
         // returns all tickets submitted by a user, according to the roles of the currently logged in user
-        [Authorize("AdminHrItFromDb")]
+        [Authorize("AdminOrDepartmentUser")]
         [HttpGet("alltickets/{userId}")]
         public async Task<ActionResult<List<ViewTicketDto>>> getAllUsersTickets(string userId)
         {
-            var currentUserRoles = await _userUtils.getUserRoles();
 
-            if (currentUserRoles == null || currentUserRoles.Count == 0)
-                return Forbid();
-
-            var tickets = await _sharedService.getAllTicketsFromUserByDepartment(userId, currentUserRoles);
+            var tickets = await _sharedService.getAllTicketsFromUserByDepartment(userId);
 
             if (tickets == null || !tickets.Any())
                 return NotFound("This user has no tickets");
@@ -141,33 +131,26 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy = "HrOrIt")]
+        [Authorize(Policy = "DepartmentUserOnly")]
         [HttpPatch("ticketstatus/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto?>> changeTicketStatus(int ticketId, [FromBody] ChangeTicketStatusDto status)
         {
-            var currentUserRoles = await _userUtils.getUserRoles();
+            var currentUserId = _userUtils.getUserIdOr401();
 
-            if (currentUserRoles == null || currentUserRoles.Count == 0)
-                return Forbid();
-
-            var ticket = await _sharedService.changeTicketStatus(ticketId, status.Status, currentUserRoles);
+            var ticket = await _sharedService.changeTicketStatus(ticketId, status.Status, currentUserId);
 
             if (ticket == null) return NotFound();
 
             return Ok(ticket);
         }
 
-        [Authorize(Policy = "HrOrIt")]
+        [Authorize(Policy = "DepartmentUserOnly")]
         [HttpPatch("assigntome/{ticketId}")]
         public async Task<ActionResult<ViewTicketDto?>> assignTicketToMe(int ticketId)
         {
-            var currentUserRoles = await _userUtils.getUserRoles();
             var currentUserId = _userUtils.getUserIdOr401(); 
 
-            if (string.IsNullOrEmpty(currentUserId) || currentUserRoles == null || currentUserRoles.Count == 0)
-                return Forbid();
-
-            var ticket = await _sharedService.assignTicketToUser(ticketId, currentUserId, currentUserRoles);
+            var ticket = await _sharedService.assignTicketToUser(ticketId, currentUserId);
 
             if (ticket == null) return NotFound();
 
@@ -175,18 +158,17 @@ namespace TicketingSys.Controllers
         }
 
         // send response for a ticket
-        [Authorize(Policy = "HrOrIt")]
+        [Authorize(Policy = "DepartmentUserOnly")]
         [HttpPost("response")] 
         public async Task<IActionResult> AddResponse([FromBody] NewResponseDto dto)
         {
             var userId =_userUtils.getUserIdOr401();
-            var CurrentUserRoles = await _userUtils.getUserRoles();
 
             var referencedTicket = await _sharedService.getTicketById(dto.TicketId);
 
             if (referencedTicket is null) return BadRequest("Invalid ticket id");
 
-            var savedResponse = await _sharedService.AddResponse(dto, userId, CurrentUserRoles);
+            var savedResponse = await _sharedService.AddResponse(dto, userId);
 
             if (dto.Attachments != null && dto.Attachments.Any())
             {
@@ -200,7 +182,7 @@ namespace TicketingSys.Controllers
 
 
         // get all responses i sent - HR and IT only
-        [Authorize(Policy = "HrOrIt")]
+        [Authorize(Policy = "DepartmentUserOnly")]
         [HttpGet("sentresponses")]
         public async Task<ActionResult<List<ViewResponseDto>>> getSentResponses()
         {
@@ -216,7 +198,7 @@ namespace TicketingSys.Controllers
 
 
         // should return response the hr or it user sent but double check if it works properly
-        [Authorize(Policy = "HrOrIt")]
+        [Authorize(Policy = "DepartmentUserOnly")]
         [HttpGet("sentresponse/{responseId}")]
         public async Task<ActionResult<ViewResponseDto?>> getSentResponse(int responseId)
         {
@@ -231,7 +213,7 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy ="AllRoles")]
+        [Authorize]
         [HttpGet("categories")]
         public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategories()
         {
@@ -244,7 +226,7 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy = "AllRoles")]
+        [Authorize]
         [HttpGet("categories/{categoryId}")]
         public async Task<ActionResult<ViewDepartmentDto?>> getCategoryById(int categoryId)
         {
@@ -256,7 +238,7 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy = "AllRoles")]
+        [Authorize]
         [HttpGet("{deptId}/categories")]
         public async Task<ActionResult<List<ViewTicketCategoryDto>>> getAllCategoriesById(int deptId)
         {
@@ -269,7 +251,7 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy = "AllRoles")]
+        [Authorize]
         [HttpGet("departments")]
         public async Task<ActionResult<List<ViewDepartmentDto>>> GetAllDepartments()
         {
@@ -279,7 +261,20 @@ namespace TicketingSys.Controllers
         }
 
 
-        [Authorize(Policy ="AllRoles")]
+        // returns departments user has access to by UserDepartmentAccess model
+        [Authorize(Policy = "DepartmentUserOnly")]
+        [HttpGet("mydepartments")]
+        public async Task<ActionResult<List<ViewDepartmentDto>>> GetMyAssignedDepartments()
+        {
+            var userId = _userUtils.getUserIdOr401();
+
+            var results = await _sharedService.getMyAssignedDepartments(userId);
+
+            return Ok(results);
+        }
+
+
+        [Authorize]
         [HttpGet("departments/{departmentId}")]
         public async Task<ActionResult<ViewDepartmentDto?>> getDepartmentById(int departmentId)
         {

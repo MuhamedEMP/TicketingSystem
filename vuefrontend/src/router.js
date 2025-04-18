@@ -11,13 +11,15 @@ import InternalServerError from './pages/errorPages/InternalServerError.vue';
 import AddDepartment from './pages/adminPages/AddDepartment.vue';
 import AddCategory from './pages/adminPages/AddCategory.vue';
 import ViewDepartments from './pages/adminPages/ViewDepartments.vue';
+import MyDepartments from './pages/DeptUserPages/MyDepartments.vue';
+import DepartmentTickets from './pages/DeptUserPages/DepartmentTickets.vue';
 
 const routes = [
   { path: '/unauthorized', component: Unauthorized },
   { path: '/forbidden', component: Forbidden },
   { path: '/internal', component: InternalServerError },
   { path: '/', component: Login },
-  { path: '/home', component: Home, // avaliable to all users will conditionally display data
+  { path: '/home', component: Home, // avaliable to all users, will conditionally display data
     meta: {
       requiresAuth: true
     }
@@ -85,6 +87,17 @@ const routes = [
     component: AddCategory,
     meta: { requiresAuth: true, roles: ['admin'] }
   }
+  ,
+  {
+    path: '/mydepartments',
+    component: MyDepartments,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/sharedtickets',
+    component: DepartmentTickets,
+    meta: { requiresAuth: true }
+  }
   
 ];
 
@@ -92,33 +105,6 @@ const routes = [
 export const router = createRouter({
   history: createWebHistory(), 
   routes,
-});
-
-
-router.beforeEach(async (to, from, next) => {
-  const requiresAuth = to.meta.requiresAuth;
-  const requiredRoles = to.meta.roles || [];
-
-  const token = localStorage.getItem('accessToken');
-  const storedRoles = JSON.parse(localStorage.getItem('roles') || '[]');
-  const userRoles = storedRoles.map((r) => r.toLowerCase());
-
-  if (requiresAuth && !token) {
-    next('/unauthorized');
-    return;
-  }
-
-  if (requiresAuth && requiredRoles.length > 0) {
-    const hasAccess = requiredRoles.some((role) =>
-      userRoles.includes(role.toLowerCase())
-    );
-
-    if (!hasAccess) {
-      return next('/forbidden');
-    }
-  }
-
-  next();
 });
 
 

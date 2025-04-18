@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TicketingSys.Dtos.DepartmentDtos;
 
 namespace TicketingSys.Dtos.UserDtos
 {
@@ -12,9 +13,13 @@ namespace TicketingSys.Dtos.UserDtos
 
         public string email { get; set; }
 
-        public List<string> roles { get; set; }
+        public List<AccessibleDepartmentDto>? accessibleDepartmentDtos { get; set; }
 
         public string? userId { get; set; }
+
+        public bool isAdmin { get; set; }   
+
+        public string? roleType { get; set; }
 
     }
 }

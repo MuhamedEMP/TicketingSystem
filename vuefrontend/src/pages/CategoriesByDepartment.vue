@@ -6,7 +6,7 @@
       
       <h1>Categories for Department {{ deptName }}</h1>
       <!-- Admin-only: Add Category Button -->
-    <div v-if="hasRole('admin')" class="button-container">
+    <div v-if="hasPolicy('AdminOnly')" class="button-container">
       <router-link
         :to="`/department/${deptIdFromRoute}/categories/add`"
         class="button small-button"
@@ -17,18 +17,24 @@
 
     <ul v-if="categories.length">
       <li v-for="cat in categories" :key="cat.name" class="category-item">
-        <div v-if="hasRole('admin')" style="display: inline-flex; gap: 0.5rem; align-items: center;">
+        <div v-if="hasPolicy('AdminOnly')" style="display: inline-flex; gap: 0.5rem; align-items: center;">
           <button @click="deleteCategory(cat.id)" class="button small-button delete-button">
             🗑️ Delete
           </button>
         </div>
-
         <router-link
-          :to="`/newticket/${deptIdFromRoute}/${cat.id}`"
-          class="category-link"
-        >
-          {{ cat.name }} <span v-if="cat.description">- {{ cat.description }}</span>
-        </router-link>
+  :to="`/newticket/${deptIdFromRoute}/${cat.id}`"
+  class="category-link"
+  :class="{ 'disabled-link': !isRegularUser }"
+  @click.prevent="!isRegularUser"
+>
+  {{ cat.name }}
+  <span v-if="cat.description"> - {{ cat.description }}</span>
+</router-link>
+
+
+
+
       </li>
   </ul>
 
@@ -44,9 +50,8 @@
   import { getDepartmentById } from '../api/departmentApi';
   import UserNavbar from '../components/UserNavbar.vue';
   import api from '../utils/api';
+  import { hasPolicy } from '../utils/hasPolicy';
 
-  const roles = JSON.parse(localStorage.getItem('roles') || '[]');
-  const hasRole = (role) => roles.map(r => r.toLowerCase()).includes(role.toLowerCase());
 
   const route = useRoute();
   const deptIdFromRoute = route.params.deptId;

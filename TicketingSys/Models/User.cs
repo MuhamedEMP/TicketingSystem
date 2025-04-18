@@ -12,7 +12,9 @@ namespace TicketingSys.Models
 
         public string email { get; set; }
 
-        public List<string> roles { get; set; } = new List<string>();
+        public bool IsAdmin { get; set; } = false;
+
+        public List<UserDepartmentAccess> DepartmentAccesses { get; set; }
 
 
     }
