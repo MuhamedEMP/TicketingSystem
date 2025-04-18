@@ -112,7 +112,7 @@ namespace TicketingSys.Controllers
             var ticketDept = ticket.Department.Name.ToLowerInvariant();
 
 
-            return Ok(ticket.modelToViewDto());
+            return Ok(ticket.modelToViewDto(includesResponses:true));
         }
 
 

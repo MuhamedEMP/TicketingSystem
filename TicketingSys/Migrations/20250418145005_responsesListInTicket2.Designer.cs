@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TicketingSys.Settings;
@@ -11,9 +12,11 @@ using TicketingSys.Settings;
 namespace TicketingSys.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250418145005_responsesListInTicket2")]
+    partial class responsesListInTicket2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,6 +66,9 @@ namespace TicketingSys.Migrations
                     b.Property<int>("TicketId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("TicketId1")
+                        .HasColumnType("integer");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -70,6 +76,8 @@ namespace TicketingSys.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("TicketId");
+
+                    b.HasIndex("TicketId1");
 
                     b.HasIndex("UserId");
 
@@ -277,10 +285,14 @@ namespace TicketingSys.Migrations
             modelBuilder.Entity("TicketingSys.Models.Response", b =>
                 {
                     b.HasOne("TicketingSys.Models.Ticket", "Ticket")
-                        .WithMany("Responses")
+                        .WithMany()
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("TicketingSys.Models.Ticket", null)
+                        .WithMany("Responses")
+                        .HasForeignKey("TicketId1");
 
                     b.HasOne("TicketingSys.Models.User", "User")
                         .WithMany()

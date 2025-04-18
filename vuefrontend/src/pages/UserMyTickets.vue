@@ -45,19 +45,24 @@
         </router-link>
         <p>{{ ticket.description }}</p>
         <div class="ticket-meta">
-          <span>Status: {{ ticket.status }}</span>
-          <span>Urgency: {{ ticket.urgency }}</span>
-          <span>Category: {{ ticket.categoryName }}</span>
-          <span>Department: {{ ticket.departmentName }}</span>
-          <span>Submitted: {{ new Date(ticket.createdAt).toLocaleString() }}</span>
-          <span>
-            Updated: 
-            {{ new Date(ticket.updatedAt).getFullYear() > 2000 
-                ? new Date(ticket.updatedAt).toLocaleString() 
-                : 'No Updates' }}
-          </span>
+        <span>Status: {{ ticket.status }}</span>
+        <span>Urgency: {{ ticket.urgency }}</span>
+        <span>Category: {{ ticket.categoryName }}</span>
+        <span>Department: {{ ticket.departmentName }}</span>
+        <span>Submitted: {{ new Date(ticket.createdAt).toLocaleString() }}</span>
+        <span>
+          Updated: 
+          {{ new Date(ticket.updatedAt).getFullYear() > 2000 
+              ? new Date(ticket.updatedAt).toLocaleString() 
+              : 'No Updates' }}
+        </span>
+        <span>
+          <div class="responses-text">     
+            {{ ticket.responsesCount > 0 ? `Number of Responses: ${ticket.responsesCount}` : 'No responses' }}
+          </div>
+        </span>
+      </div>
 
-        </div>
       </div>
     </div>
   </div>
@@ -106,4 +111,8 @@ const fetchTickets = async () => {
 onMounted(fetchTickets);
 </script>
 
-<style src="../assets/css/tickets.css"></style>
+<style scoped ="../assets/css/tickets.css">
+.responses-text{
+  color:whitesmoke;
+}
+</style>

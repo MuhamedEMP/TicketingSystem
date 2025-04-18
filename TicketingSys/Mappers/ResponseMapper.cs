@@ -7,18 +7,31 @@ namespace TicketingSys.Mappers
     {
         public static ViewResponseDto ToViewDto(this Response response)
         {
-            return new ViewResponseDto
+            // include the ticket in dto by default
+            return response.ToViewDto(includeTicket: true);
+        }
+
+        // use includeTicket=false when including ViewResponseDto in ViewTicketDto
+        public static ViewResponseDto ToViewDto(this Response response, bool includeTicket)
+        {
+            var dto = new ViewResponseDto
             {
                 Id = response.Id,
                 TicketId = response.TicketId,
-                Ticket = response.Ticket.modelToViewDto(),
                 UserId = response.UserId,
-                UserFullName = response.User?.fullName, 
+                UserFullName = response.User?.fullName,
                 AttachmentUrls = response.Attachments?.Select(a => a.Path).ToList() ?? new List<string>(),
                 Message = response.Message,
                 Status = response.Status,
                 CreatedAt = response.CreatedAt
             };
+
+            if (includeTicket && response.Ticket != null)
+            {
+                dto.Ticket = response.Ticket.modelToViewDto();
+            }
+
+            return dto;
         }
     }
 }

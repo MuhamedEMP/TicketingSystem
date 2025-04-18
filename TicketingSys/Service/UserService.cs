@@ -37,6 +37,7 @@ namespace TicketingSys.Service
             .Include(t => t.Category)
             .Include(t => t.Department)
             .Include(t => t.Attachments)
+            .Include(t => t.Responses)
             .FirstOrDefaultAsync(t => t.Id == ticketId && t.SubmittedById == userId);
         }
 
@@ -50,6 +51,7 @@ namespace TicketingSys.Service
             .Include(t => t.AssignedTo)
             .Include(t => t.SubmittedBy)
             .Include(t => t.Attachments)
+            .Include(t => t.Responses)
             .ToListAsync();
 
             return ticket.SortByStatusAndUrgency();
@@ -62,6 +64,7 @@ namespace TicketingSys.Service
                 .Include(t => t.Category)
                 .Include(t => t.Department)
                 .Include(t => t.Attachments)
+                .Include(t => t.Responses)
                 .Where(t => t.SubmittedById == userId)
                 .AsQueryable();
 
@@ -106,7 +109,7 @@ namespace TicketingSys.Service
             var tickets = await query.ToListAsync();
             var sorted = tickets.SortByStatusAndUrgency();
 
-            return sorted.Select(t => t.modelToViewDto()).ToList();
+            return sorted.Select(t => t.modelToViewDto(includesResponses:true)).ToList();
         }
 
 

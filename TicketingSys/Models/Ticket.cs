@@ -39,5 +39,7 @@ namespace TicketingSys.Models
         public DateTime UpdatedAt { get; set; }
 
         public string Description { get; set; }
+        public List<Response>? Responses { get; set; }
+
     }
 }

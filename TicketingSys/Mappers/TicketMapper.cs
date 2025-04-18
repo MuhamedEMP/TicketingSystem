@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Xml;
 using TicketingSys.Dtos.TicketDtos;
 using TicketingSys.Models;
 
@@ -45,6 +46,21 @@ namespace TicketingSys.Mappers
             };
         }
 
+
+        // this overload adds list of related responses to the ticket dto if the ticket query includes them
+        public static ViewTicketDto modelToViewDto(this Ticket ticket, bool includesResponses)
+        {
+            var dto = ticket.modelToViewDto();
+
+            if (includesResponses && ticket.Responses is not null)
+            {
+                dto.ViewResponses = ticket.Responses.Select(r => r.ToViewDto(false)).ToList();
+                dto.responsesCount = ticket.Responses.Count();
+            }
+
+            return dto;
+
+        }
 
         public static List<ViewTicketDto> modelToViewDtoList(this List<Ticket> tickets)
         {

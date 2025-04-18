@@ -13,6 +13,7 @@ import AddCategory from './pages/adminPages/AddCategory.vue';
 import ViewDepartments from './pages/adminPages/ViewDepartments.vue';
 import MyDepartments from './pages/DeptUserPages/MyDepartments.vue';
 import DepartmentTickets from './pages/DeptUserPages/DepartmentTickets.vue';
+import DeptViewTicket from './pages/DeptUserPages/DeptViewTicket.vue';
 
 const routes = [
   { path: '/unauthorized', component: Unauthorized },
@@ -96,6 +97,11 @@ const routes = [
   {
     path: '/sharedtickets',
     component: DepartmentTickets,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/sharedtickets/:id',
+    component: DeptViewTicket,
     meta: { requiresAuth: true }
   }
   

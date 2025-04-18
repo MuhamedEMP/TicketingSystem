@@ -60,6 +60,7 @@
   <style scoped>
 
   .department-block {
+    background-color: #2a2a2a;
     padding: 1rem;
     margin-bottom: 2rem;
     border-radius: 10px;

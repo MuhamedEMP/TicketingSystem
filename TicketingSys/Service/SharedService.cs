@@ -226,6 +226,7 @@ namespace TicketingSys.Service
                 .Include(t => t.Category)
                 .Include(t => t.Department)
                 .Include(t => t.Attachments)
+                .Include(t=> t.Responses)
                 .FirstOrDefaultAsync(t => t.Id == ticketId);
 
             if (ticket == null)

@@ -1,4 +1,6 @@
-﻿namespace TicketingSys.Dtos.TicketDtos
+﻿using TicketingSys.Dtos.ResponseDtos;
+
+namespace TicketingSys.Dtos.TicketDtos
 {
     public class ViewTicketDto
     {
@@ -23,5 +25,9 @@
         public DateTime UpdatedAt { get; set; }
 
         public List<string> AttachmentPaths { get; set; }
+
+        public List<ViewResponseDto>? ViewResponses { get; set; }
+
+        public int? responsesCount { get; set; }
     }
 }

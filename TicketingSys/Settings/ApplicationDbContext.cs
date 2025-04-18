@@ -51,7 +51,7 @@ namespace TicketingSys.Settings
 
                 // Relationship: Response -> Ticket
                 entity.HasOne(r => r.Ticket)
-                      .WithMany() 
+                      .WithMany(t => t.Responses) 
                       .HasForeignKey(r => r.TicketId)
                       .OnDelete(DeleteBehavior.Cascade);
 
@@ -144,7 +144,7 @@ namespace TicketingSys.Settings
 
                     entity.HasIndex(tc => tc.Name).IsUnique();
 
-                    // 🔗 Relationship: TicketCategory -> Department
+                    // Relationship: TicketCategory -> Department
                     entity.HasOne(tc => tc.Department)
                           .WithMany()
                           .HasForeignKey(tc => tc.DepartmentId)

@@ -75,7 +75,7 @@ namespace TicketingSys.Controllers
                 return NotFound($"Ticket with id {ticketId} not found");
             }
 
-            return ticket.modelToViewDto();
+            return ticket.modelToViewDto(includesResponses:true);
         }
 
 
