@@ -261,6 +261,19 @@ namespace TicketingSys.Controllers
         }
 
 
+        // returns departments user has access to by UserDepartmentAccess model
+        [Authorize(Policy = "DepartmentUserOnly")]
+        [HttpGet("mydepartments")]
+        public async Task<ActionResult<List<ViewDepartmentDto>>> GetMyAssignedDepartments()
+        {
+            var userId = _userUtils.getUserIdOr401();
+
+            var results = await _sharedService.getMyAssignedDepartments(userId);
+
+            return Ok(results);
+        }
+
+
         [Authorize]
         [HttpGet("departments/{departmentId}")]
         public async Task<ActionResult<ViewDepartmentDto?>> getDepartmentById(int departmentId)

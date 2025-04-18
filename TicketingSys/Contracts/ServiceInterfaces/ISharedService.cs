@@ -36,6 +36,8 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task<List<ViewDepartmentDto>> getAllDepartments();
 
+        Task<List<ViewDepartmentDto>> getMyAssignedDepartments(string userId);
+
         Task<ViewTicketCategoryDto?> getCategoryById(int categoryId);
 
         Task<ViewDepartmentDto?> getDepartmentById(int departmentId);

@@ -49,6 +49,7 @@ const msal = new PublicClientApplication(msalConfig);
       // 🔐 Save info to localStorage for rendering
       localStorage.setItem("userId", user.userId);
       localStorage.setItem("userFullName", user.fullName);
+      localStorage.setItem("firstName", user.firstName);
       localStorage.setItem("isAdmin", JSON.stringify(user.isAdmin));
       localStorage.setItem("accessibleDepartments", JSON.stringify(user.accessibleDepartmentDtos || []));
 
@@ -57,11 +58,14 @@ const msal = new PublicClientApplication(msalConfig);
       const grantedPolicies = [];
 
       // AdminOnly handler logic
-      if (user.isAdmin) {
+      if (user.isAdmin && !hasDeptAccess) {
         grantedPolicies.push("AdminOnly");
       }
 
-      // AdminOrDepartmentUser handler logic
+      if (user.isAdmin && hasDeptAccess) {
+        grantedPolicies.push("AdminAndDepartmentUser");
+      }
+
       if (user.isAdmin || hasDeptAccess) {
         grantedPolicies.push("AdminOrDepartmentUser");
       }

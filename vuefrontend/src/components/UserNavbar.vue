@@ -23,14 +23,7 @@
         Admin Panel
       </router-link>
 
-      <!-- ✅ Show to department users -->
-      <router-link
-        v-if="hasPolicy('DepartmentUserOnly')"
-        to="/tickets"
-        class="button small-button"
-      >
-        Department Tickets
-      </router-link>
+
 
       <!-- ✅ Show to admins OR department users -->
       <router-link
@@ -38,7 +31,7 @@
         to="/sharedtickets"
         class="button small-button"
       >
-        Shared Tickets
+        My Departments
       </router-link>
 
       <!-- User icon dropdown -->

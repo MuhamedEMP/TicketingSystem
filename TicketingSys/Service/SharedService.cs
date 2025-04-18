@@ -353,6 +353,19 @@ namespace TicketingSys.Service
             }).ToList();
         }
 
+
+        public async Task<List<ViewDepartmentDto>> getMyAssignedDepartments(string userId)
+        {
+            var assignedDepts = await _context.UserDepartmentAccess
+                .Where(da => da.UserId == userId)
+                .Select(da => da.Department) 
+                .Select(d => d.modelToViewDto())
+                .ToListAsync();
+
+            return assignedDepts;
+        }
+
+
         public async Task<ViewDepartmentDto?> getDepartmentById(int id)
         {
             var department = await _context.Departments.FirstOrDefaultAsync(d => d.Id == id);
@@ -368,6 +381,5 @@ namespace TicketingSys.Service
             if (category is null) return null;
             return category.modelToViewDto();
         }
-
     }
 }
