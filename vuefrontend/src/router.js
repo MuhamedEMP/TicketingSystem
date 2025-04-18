@@ -14,6 +14,7 @@ import ViewDepartments from './pages/adminPages/ViewDepartments.vue';
 import MyDepartments from './pages/DeptUserPages/MyDepartments.vue';
 import DepartmentTickets from './pages/DeptUserPages/DepartmentTickets.vue';
 import DeptViewTicket from './pages/DeptUserPages/DeptViewTicket.vue';
+import SentResponses from './pages/DeptUserPages/SentResponses.vue';
 
 const routes = [
   { path: '/unauthorized', component: Unauthorized },
@@ -102,6 +103,11 @@ const routes = [
   {
     path: '/sharedtickets/:id',
     component: DeptViewTicket,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/sentresponses',
+    component: SentResponses,
     meta: { requiresAuth: true }
   }
   

@@ -22,7 +22,7 @@ namespace TicketingSys.Mappers
                 UserFullName = response.User?.fullName,
                 AttachmentUrls = response.Attachments?.Select(a => a.Path).ToList() ?? new List<string>(),
                 Message = response.Message,
-                Status = response.Status,
+                Status = response.Status.ToString(),
                 CreatedAt = response.CreatedAt
             };
 

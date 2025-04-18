@@ -193,6 +193,7 @@ namespace TicketingSys.Service
             return sorted.Select(r => r.ToViewDto()).ToList();
         }
 
+        // returns responses by the userId of the user who sent them
         public async Task<ViewResponseDto?> getSentResponseByUserIdAndResponseId(string userId, int responseId)
         {
             var response = await _context.Responses

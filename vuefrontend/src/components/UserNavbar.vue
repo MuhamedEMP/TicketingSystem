@@ -27,11 +27,20 @@
 
       <!-- ✅ Show to admins OR department users -->
       <router-link
-        v-if="hasPolicy('AdminOrDepartmentUser')"
+        v-if="hasPolicy('AdminOrDepartmentUser') && !isOnSharedTickets"
         to="/sharedtickets"
         class="button small-button"
       >
         My Departments
+      </router-link>
+
+      <!-- ✅ Show to department users -->
+      <router-link
+        v-if="hasPolicy('DepartmentUserOnly') && !isOnSentResponses"
+        to="/sentresponses"
+        class="button small-button"
+      >
+        Responses
       </router-link>
 
       <!-- User icon dropdown -->
@@ -51,8 +60,13 @@ import {  ref } from 'vue';
 import { useRouteFlags } from '../utils/routeUtils';
 import router from '../router';
 import { hasPolicy } from '../utils/hasPolicy';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const { notHome, notMyTickets } = useRouteFlags();
+
+const isOnSharedTickets = route.path === '/sharedtickets';
+const isOnSentResponses = route.path === '/sentresponses';
 
 const dropdownOpen = ref(false);
 

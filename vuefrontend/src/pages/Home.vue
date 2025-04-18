@@ -38,7 +38,7 @@
 
     <!-- 🏢 Department Users -->
     <div v-if="hasPolicy('DepartmentUserOnly')" class="home-page">
-      <h1>Welcome, Department Staff</h1>
+      <h1>Welcome, {{ firstName }}</h1>
       <p>You can view and respond to tickets assigned to your department.</p>
       <router-link to="/mydepartments" class="button">Go to My Departments</router-link>
     </div>

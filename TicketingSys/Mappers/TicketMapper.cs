@@ -54,7 +54,11 @@ namespace TicketingSys.Mappers
 
             if (includesResponses && ticket.Responses is not null)
             {
-                dto.ViewResponses = ticket.Responses.Select(r => r.ToViewDto(false)).ToList();
+                dto.ViewResponses = ticket.Responses
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Select(r => r.ToViewDto( includeTicket: false))
+                    .ToList();
+
                 dto.responsesCount = ticket.Responses.Count();
             }
 
