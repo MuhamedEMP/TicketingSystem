@@ -61,8 +61,7 @@ namespace TicketingSys.Controllers
             var exists = await _authService.checkIfUserExists(sub);
             if (exists is true) return Ok("User exists");
 
-
-            var result = await _authService.addUserAsync(sub, email, roles, firstName, fullName, lastName);
+            var result = await _authService.addUserAsync(sub, email, firstName, fullName, lastName);
             return Ok("User created");
         }
 

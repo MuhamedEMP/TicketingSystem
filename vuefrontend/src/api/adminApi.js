@@ -14,10 +14,8 @@ export const getAllUsers = () => {
     return api.get(`/admin/user/${userId}`);
   };
   
-  export const changeUserRole = (userId, roles) => {
-    return api.patch(`/admin/changerole/${userId}`, {
-      roles
-    });
+  export const changeUserRole = (userId, payload) => {
+    return api.patch(`/admin/changerole/${userId}`, payload); 
   };
   
   export const submitDepartment = (deptName) => {
@@ -28,3 +26,6 @@ export const getAllUsers = () => {
     const res = await api.post('/admin/addcategory', newCategory)
     return res.data
   }
+
+
+  

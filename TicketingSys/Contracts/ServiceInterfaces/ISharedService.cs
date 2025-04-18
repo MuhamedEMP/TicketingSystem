@@ -16,7 +16,7 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task<List<Ticket>?> getAllTicketByUserId(string userId);
 
-        Task<Response?> AddResponse(NewResponseDto dto, string userId, List<string> currentUserRoles);
+        Task<Response?> AddResponse(NewResponseDto dto, string userId);
 
         Task<Ticket?> getTicketById(int ticketId); 
 
@@ -28,13 +28,15 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task<List<ViewTicketDto>?> queryAlLTicketsFromMyDepartment(string currentUserId, SharedTicketQueryParamsDto query);
 
-        Task<List<ViewTicketDto>?> getAllTicketsFromUserByDepartment(string userId, List<string> currentUserRoles);
+        Task<List<ViewTicketDto>?> getAllTicketsFromUserByDepartment(string userId);
 
-        Task<ViewTicketDto?> changeTicketStatus(int ticketId, TicketStatusEnum status, List<string> currentUserRoles);
+        Task<ViewTicketDto?> changeTicketStatus(int ticketId, TicketStatusEnum status, string userId);
 
-        Task<ViewTicketDto?> assignTicketToUser(int ticketId, string currentUserId, List<string> currentUserRoles);
+        Task<ViewTicketDto?> assignTicketToUser(int ticketId, string currentUserId);
 
         Task<List<ViewDepartmentDto>> getAllDepartments();
+
+        Task<List<ViewDepartmentDto>> getMyAssignedDepartments(string userId);
 
         Task<ViewTicketCategoryDto?> getCategoryById(int categoryId);
 

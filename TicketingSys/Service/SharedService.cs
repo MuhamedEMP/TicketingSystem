@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Net.Sockets;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.DepartmentDtos;
@@ -24,7 +25,7 @@ namespace TicketingSys.Service
             _context = context;
         }
 
-        public async Task<Response?> AddResponse(NewResponseDto dto, string userId, List<string> currentUserRoles)
+        public async Task<Response?> AddResponse(NewResponseDto dto, string userId)
         {
             var response = new Response
             {
@@ -41,10 +42,11 @@ namespace TicketingSys.Service
             var referencedTicket = await _context.Tickets.FirstOrDefaultAsync(x => x.Id == dto.TicketId);
             var departmentName = referencedTicket.Department.Name.ToLower();
 
-            var userHasAccess = currentUserRoles
-                .Any(role => role.Equals(departmentName, StringComparison.OrdinalIgnoreCase));
+            var userHasAccess = await _context.UserDepartmentAccess
+                .AnyAsync(a => a.UserId == userId && a.DepartmentId == referencedTicket.DepartmentId);
 
-            if (!userHasAccess)
+
+            if (userHasAccess is false)
                 return null;
 
             if (referencedTicket.Status != dto.Status)
@@ -73,17 +75,19 @@ namespace TicketingSys.Service
         {
             var user = await _context.Users.FirstOrDefaultAsync(u=> u.userId == userId);
 
-            var normalizedRoles = user.roles
-            .Select(role => role.ToLowerInvariant())
-            .ToList();
+            var departmentIds = await _context.UserDepartmentAccess
+            .Where(a => a.UserId == userId)
+            .Select(a => a.DepartmentId)
+            .ToListAsync();
 
+   
             var tickets = await _context.Tickets
            .Include(t => t.SubmittedBy)
            .Include(t => t.AssignedTo)
            .Include(t => t.Category)
            .Include(t => t.Department)
            .Include(t => t.Attachments)
-           .Where(t => normalizedRoles.Contains(t.Department.Name.ToLower()))
+           .Where(t => departmentIds.Contains(t.DepartmentId))
            .ToListAsync();
 
             if (tickets == null || tickets.Count == 0) return null;
@@ -98,12 +102,13 @@ namespace TicketingSys.Service
                 return null;
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.userId.ToLower() == currentUserId.ToLower());
-            if (user == null || user.roles == null || user.roles.Count == 0)
+            if (user == null)
                 return null;
 
-            var normalizedRoles = user.roles
-                .Select(role => role.ToLowerInvariant())
-                .ToList();
+            var departmentIds = await _context.UserDepartmentAccess
+            .Where(a => a.UserId == currentUserId)
+            .Select(a => a.DepartmentId)
+            .ToListAsync();
 
             var queryable = _context.Tickets
                 .Include(t => t.SubmittedBy)
@@ -113,8 +118,8 @@ namespace TicketingSys.Service
                 .Include(t => t.Attachments)
                 .AsQueryable();
 
-            // ✅ Filter by departments the current user is allowed to see
-            queryable = queryable.Where(t => normalizedRoles.Contains(t.Department.Name.ToLower()));
+
+            queryable = queryable.Where(t => departmentIds.Contains(t.DepartmentId));
 
             if (!string.IsNullOrWhiteSpace(query.AssignedToName))
             {
@@ -233,12 +238,23 @@ namespace TicketingSys.Service
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.userId == id);
             if (user == null) return null;
-            return user.userModelToDto();
+
+            var accessibleDepartments = await _context.UserDepartmentAccess
+                .Include(ad => ad.Department)
+                .Where(ad => ad.UserId == id)
+                .ToListAsync();
+
+
+            return user.userModelToDto(accessibleDepartments);
         }
 
-        public async Task<List<ViewTicketDto>?> getAllTicketsFromUserByDepartment(string userId, List<string> currentUserRoles)
+        public async Task<List<ViewTicketDto>?> getAllTicketsFromUserByDepartment(string userId)
         {
-            if (currentUserRoles.Contains("admin"))
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.userId == userId);
+            if (user is null) return null;
+
+            if (user.IsAdmin == true)
             {
                 var allTickets = await _context.Tickets
                     .Include(t => t.SubmittedBy)
@@ -253,6 +269,10 @@ namespace TicketingSys.Service
                 return sortedadmin.modelToViewDtoList();
             }
 
+            var departmentIds = await _context.UserDepartmentAccess
+            .Where(a => a.UserId == userId)
+            .Select(a => a.DepartmentId)
+            .ToListAsync();
 
             var tickets = await _context.Tickets
                 .Include(t => t.SubmittedBy)
@@ -260,9 +280,7 @@ namespace TicketingSys.Service
                 .Include(t => t.Category)
                 .Include(t => t.Department)
                 .Include(t => t.Attachments)
-                .Where(t =>
-                    t.SubmittedById == userId &&
-                    currentUserRoles.Contains(t.Department.Name.ToLower()))
+                .Where(t => t.SubmittedById == userId && departmentIds.Contains(t.DepartmentId))
                 .ToListAsync();
 
             var sorted = tickets.SortByStatusAndUrgency();
@@ -271,7 +289,7 @@ namespace TicketingSys.Service
             return null;
         }
 
-        public async Task<ViewTicketDto?> changeTicketStatus(int ticketId, TicketStatusEnum status, List<string> currentUserRoles)
+        public async Task<ViewTicketDto?> changeTicketStatus(int ticketId, TicketStatusEnum status, string userId)
         {
             // include object references
             var ticket = await _context.Tickets
@@ -284,9 +302,9 @@ namespace TicketingSys.Service
 
             if (ticket == null) return null;
 
-            var departmentName = ticket.Department.Name.ToLower();
-            var userHasAccess = currentUserRoles
-                .Any(role => role.Equals(departmentName, StringComparison.OrdinalIgnoreCase) || role.Equals("admin", StringComparison.OrdinalIgnoreCase));
+            var userHasAccess = await _context.UserDepartmentAccess
+                .AnyAsync(a => a.UserId == userId && a.DepartmentId == ticket.DepartmentId);
+
 
             if (!userHasAccess) return null;
 
@@ -297,7 +315,7 @@ namespace TicketingSys.Service
             return ticket.modelToViewDto();
         }
 
-        public async Task<ViewTicketDto?> assignTicketToUser(int ticketId, string userId, List<string> currentUserRoles)
+        public async Task<ViewTicketDto?> assignTicketToUser(int ticketId, string userId)
         {
             // include object references
             var ticket = await _context.Tickets
@@ -311,8 +329,10 @@ namespace TicketingSys.Service
             if (ticket == null) return null;
 
             var departmentName = ticket.Department.Name.ToLower();
-            var userHasAccess = currentUserRoles
-                .Any(role => role.Equals(departmentName, StringComparison.OrdinalIgnoreCase) || role.Equals("admin", StringComparison.OrdinalIgnoreCase));
+
+            var userHasAccess = await _context.UserDepartmentAccess
+            .AnyAsync(a => a.UserId == userId && a.DepartmentId == ticket.DepartmentId);
+
 
             if (!userHasAccess) return null;
 
@@ -333,6 +353,19 @@ namespace TicketingSys.Service
             }).ToList();
         }
 
+
+        public async Task<List<ViewDepartmentDto>> getMyAssignedDepartments(string userId)
+        {
+            var assignedDepts = await _context.UserDepartmentAccess
+                .Where(da => da.UserId == userId)
+                .Select(da => da.Department) 
+                .Select(d => d.modelToViewDto())
+                .ToListAsync();
+
+            return assignedDepts;
+        }
+
+
         public async Task<ViewDepartmentDto?> getDepartmentById(int id)
         {
             var department = await _context.Departments.FirstOrDefaultAsync(d => d.Id == id);
@@ -348,6 +381,5 @@ namespace TicketingSys.Service
             if (category is null) return null;
             return category.modelToViewDto();
         }
-
     }
 }

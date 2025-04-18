@@ -16,7 +16,7 @@ using TicketingSys.Util;
 
 namespace TicketingSys.Controllers
 {
-    [Authorize(Policy = "UserFromDb")]
+    [Authorize(Policy = "RegularUserOnly")]
     [Route("user")]
     [ApiController]
     public class UserController : ControllerBase

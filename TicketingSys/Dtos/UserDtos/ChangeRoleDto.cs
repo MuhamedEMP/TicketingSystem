@@ -2,6 +2,7 @@
 {
     public class ChangeRoleDto
     {
-        public List<string> roles {  get; set; }
+        public bool? isAdmin { get; set; }
+        public List<int>? DepartmentIds { get; set; }
     }
 }

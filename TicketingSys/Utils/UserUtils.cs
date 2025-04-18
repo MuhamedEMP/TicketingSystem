@@ -33,22 +33,6 @@ namespace TicketingSys.Util
         }
 
 
-        public async Task<List<string>?> getUserRoles()
-        {
-            var userId = getUserIdOr401();
-            if (userId == null) return null;
-
-            var user = await _context.Users.FirstOrDefaultAsync(u=> u.userId == userId);
-
-            if (user == null) return null;
-
-            var normalizedRoles = user.roles
-                .Select(role => role.ToLowerInvariant())
-                .ToList();
-
-            return normalizedRoles;
-
-        }
 
         public async Task<bool> checkIfCategoryIsValid(int categoryId, int departmentId)
         {

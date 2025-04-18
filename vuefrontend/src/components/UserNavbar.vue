@@ -4,11 +4,36 @@
 
     <div class="nav-links button-container">
       <router-link v-if="notHome" to="/home" class="button small-button">Home</router-link>
-      <router-link v-if="notMyTickets && hasRole('user')" to="/user/mytickets" class="button small-button">My Tickets</router-link>
        <!-- Conditionally show based on role -->
-    <router-link v-if="hasRole('admin')" to="/admin" class="button small-button">Admin Panel</router-link>
-    <router-link v-if="hasRole('hr')" to="/hr" class="button small-button">HR Dashboard</router-link>
-    <router-link v-if="hasRole('it')" to="/it" class="button small-button">IT Tools</router-link>
+    <!-- ✅ Show to regular users only -->
+    <router-link
+        v-if="notMyTickets && hasPolicy('RegularUserOnly')"
+        to="/user/mytickets"
+        class="button small-button"
+      >
+        My Tickets
+      </router-link>
+
+      <!-- ✅ Show to admins only -->
+      <router-link
+        v-if="hasPolicy('AdminOnly')"
+        to="/admin"
+        class="button small-button"
+      >
+        Admin Panel
+      </router-link>
+
+
+
+      <!-- ✅ Show to admins OR department users -->
+      <router-link
+        v-if="hasPolicy('AdminOrDepartmentUser')"
+        to="/sharedtickets"
+        class="button small-button"
+      >
+        My Departments
+      </router-link>
+
       <!-- User icon dropdown -->
       <div class="user-menu" @click="toggleDropdown">
         <img src="../assets/user-icon.png" alt="User" class="user-icon" />
@@ -25,13 +50,9 @@
 import {  ref } from 'vue';
 import { useRouteFlags } from '../utils/routeUtils';
 import router from '../router';
+import { hasPolicy } from '../utils/hasPolicy';
+
 const { notHome, notMyTickets } = useRouteFlags();
-
-const roles = JSON.parse(localStorage.getItem('roles') || '[]');
-
-const hasRole = (role) => roles.map(r => r.toLowerCase()).includes(role.toLowerCase());
-
-
 
 const dropdownOpen = ref(false);
 

@@ -11,3 +11,8 @@ export async function getAllDepartments() {
     return response.data;
   }
   
+
+  export async function getMyAssignedDepartments() {
+    const response = await api.get("http://localhost:5172/shared/mydepartments");
+    return response.data
+  }

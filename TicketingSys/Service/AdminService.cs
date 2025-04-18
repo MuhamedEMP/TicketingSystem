@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
+using TicketingSys.Contracts.Misc;
 using TicketingSys.Contracts.ServiceInterfaces;
 using TicketingSys.Dtos.CategoryDtos;
 using TicketingSys.Dtos.DepartmentDtos;
@@ -7,6 +8,7 @@ using TicketingSys.Dtos.UserDtos;
 using TicketingSys.Exceptions;
 using TicketingSys.Mappers;
 using TicketingSys.Models;
+using TicketingSys.Redis;
 using TicketingSys.Settings;
 
 namespace TicketingSys.Service
@@ -14,38 +16,88 @@ namespace TicketingSys.Service
     public class AdminService : IAdminService
     {
         ApplicationDbContext _context;
+        IUserAccessCacheService _redisService;
+        ILogger<AdminService> _logger;
 
-        public AdminService(ApplicationDbContext context)
+        public AdminService(ApplicationDbContext context, IUserAccessCacheService redisService,
+                            ILogger<AdminService> logger)
         {
             _context = context;
+            _redisService = redisService;
+            _logger = logger;
         }
 
 
         public async Task<List<ViewUserDto>?> getAllUsers()
         {
             var users = await _context.Users.ToListAsync();
-            return users.Select(u => u.userModelToDto()).ToList();
+
+            var allAccess = await _context.UserDepartmentAccess
+                .Include(uda => uda.Department)
+                .ToListAsync();
+
+            var result = users.Select(user =>
+            {
+                var deptAccessList = allAccess
+                    .Where(uda => uda.UserId == user.userId)
+                    .ToList();
+
+                return user.userModelToDto(deptAccessList);
+            }).ToList();
+
+            return result;
         }
+
 
         public async Task<ViewUserDto?> getUserById(string id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.userId == id);
             if (user == null)  return null;
-            return user.userModelToDto();
+
+            var deptAccessList = await _context.UserDepartmentAccess
+            .Include(uda => uda.Department)
+            .Where(uda => uda.UserId == id)
+            .ToListAsync();
+
+            return user.userModelToDto(deptAccessList);
         }
 
         public async Task<ViewUserDto?> changeRole(ChangeRoleDto dto, string userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.userId == userId);
+
+            var user = await _context.Users
+                .Include(u => u.DepartmentAccesses)
+                .FirstOrDefaultAsync(u => u.userId == userId);
+
             if (user == null) return null;
 
-            var roles = dto.roles.Select(r => r.ToLower()).ToList();
-            
-            user.roles = roles;
+            if (dto.isAdmin is not null)
+                user.IsAdmin = dto.isAdmin.Value;
+
+            var currentDepartmentAccesses = await _context.UserDepartmentAccess
+                .Where(da => da.UserId == userId)
+                .ToListAsync();
+
+            if (dto.DepartmentIds is not null)
+            {
+                _context.UserDepartmentAccess.RemoveRange(user.DepartmentAccesses);
+
+                var newAccesses = dto.DepartmentIds.Select(deptId => new UserDepartmentAccess
+                {
+                    UserId = userId,
+                    DepartmentId = deptId
+                }).ToList();
+
+                await _context.UserDepartmentAccess.AddRangeAsync(newAccesses);
+            }
 
             await _context.SaveChangesAsync();
 
-            return user.userModelToDto();
+            await _redisService.InvalidateUserAccessAsync(userId);
+
+            var dtoResult = user.userModelToDto();
+
+            return dtoResult;
         }
 
         public async Task addDepartment(string name)
@@ -111,16 +163,34 @@ namespace TicketingSys.Service
                 usersQuery = usersQuery.Where(u => u.email.ToLower().Contains(queryParams.email.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(queryParams.role))
+            if (queryParams.isAdmin != null)
             {
-                var roleFilter = queryParams.role.ToLower();
-                usersQuery = usersQuery.Where(u =>
-                    u.roles.Any(r => r.ToLower().Contains(roleFilter)));
+                usersQuery = usersQuery.Where(u => u.IsAdmin == queryParams.isAdmin.Value);
             }
 
             var users = await usersQuery.ToListAsync();
 
-            return users.Select(u => u.userModelToDto()).ToList();
+            var allAccess = await _context.UserDepartmentAccess
+            .Include(uda => uda.Department)
+            .ToListAsync();
+
+            if (queryParams.hasDepartments != null)
+            {
+                users = users.Where(user =>
+                {
+                    var hasDept = allAccess.Any(uda => uda.UserId == user.userId);
+                    return queryParams.hasDepartments.Value ? hasDept : !hasDept;
+                }).ToList();
+            }
+
+            return users.Select(user =>
+            {
+                var deptAccessList = allAccess
+                    .Where(uda => uda.UserId == user.userId)
+                    .ToList();
+
+                return user.userModelToDto(deptAccessList);
+            }).ToList();
         }
 
 
@@ -145,8 +215,10 @@ namespace TicketingSys.Service
             var dept = await _context.Departments.FirstOrDefaultAsync(c => c.Id == id);
             if (dept == null) return false;
 
-            var isReferenced = await _context.Tickets.AnyAsync(t => t.DepartmentId == id);
-            if (isReferenced)
+            var isReferencedByTickets = await _context.Tickets.AnyAsync(t => t.DepartmentId == id);
+            var isReferencedByCategoreis = await _context.TicketCategories.AnyAsync(c => c.DepartmentId == id);
+
+            if (isReferencedByTickets || isReferencedByCategoreis)
                 throw new CantDeleteDepartmentException();
             
             _context.Remove(dept);
