@@ -20,7 +20,7 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task<Ticket?> getTicketById(int ticketId); 
 
-        Task<List<ViewResponseDto>> getResponsesSentByUser(string userId); 
+        Task<List<ViewResponseDto>> getResponsesSentByUser(string userId, ResponseQueryParamsDto query); 
 
         Task<ViewResponseDto?> getSentResponseByUserIdAndResponseId(string userId, int responseId);
 

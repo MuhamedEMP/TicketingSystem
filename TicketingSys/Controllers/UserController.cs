@@ -97,14 +97,11 @@ namespace TicketingSys.Controllers
 
         // get responses to my tickets 
         [HttpGet("myresponses")]
-        public async Task<ActionResult<List<ViewResponseDto>>> getMyResponses()
+        public async Task<ActionResult<List<ViewResponseDto>>> getMyResponses([FromQuery] ResponseQueryParamsDto query)
         {
             var userId = _userUtils.getUserIdOr401();
 
-            var results = await _userService.getResponsesToUserTickets(userId);
-
-            if (results is null || results.Count == 0)
-                return NotFound("You have no responses");
+            var results = await _userService.getResponsesToUserTickets(userId, query);
 
             return Ok(results);
         }

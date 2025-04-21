@@ -4,8 +4,16 @@
 
     <div class="nav-links button-container">
       <router-link v-if="notHome" to="/home" class="button small-button">Home</router-link>
-       <!-- Conditionally show based on role -->
-    <!-- ✅ Show to regular users only -->
+
+        <router-link
+        v-if="hasPolicy('AdminOnly') || hasPolicy('AdminAndDepartmentUser')"
+        to="/admin"
+        class="button small-button"
+      >
+        Admin Panel
+      </router-link>
+
+
     <router-link
         v-if="notMyTickets && hasPolicy('RegularUserOnly')"
         to="/user/mytickets"
@@ -14,24 +22,30 @@
         My Tickets
       </router-link>
 
-      <!-- ✅ Show to admins only -->
       <router-link
-        v-if="hasPolicy('AdminOnly')"
-        to="/admin"
+        v-if="notMyResponses && hasPolicy('RegularUserOnly')"
+        to="/myresponses"
         class="button small-button"
       >
-        Admin Panel
+        My Responses
       </router-link>
-
-
 
       <!-- ✅ Show to admins OR department users -->
       <router-link
-        v-if="hasPolicy('AdminOrDepartmentUser') && !isOnSharedTickets"
+        v-if="hasPolicy('DepartmentUserOnly') && !isOnSharedTickets"
         to="/sharedtickets"
         class="button small-button"
       >
-        My Departments
+        My Tickets
+      </router-link>
+
+        <!-- ✅ Show to admins OR department users -->
+        <router-link
+        v-if="hasPolicy('DepartmentUserOnly') && !isOnMyDepartments"
+        to="/mydepartments"
+        class="button small-button"
+      >
+        Departments
       </router-link>
 
       <!-- ✅ Show to department users -->
@@ -67,6 +81,8 @@ const { notHome, notMyTickets } = useRouteFlags();
 
 const isOnSharedTickets = route.path === '/sharedtickets';
 const isOnSentResponses = route.path === '/sentresponses';
+const isOnMyDepartments = route.path === '/mydepartments';
+const notMyResponses = route.path != '/myresponses';
 
 const dropdownOpen = ref(false);
 

@@ -19,36 +19,40 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const originalRequest = error.config;
+
     if (error.response) {
       const status = error.response.status;
 
-      // prevent infinite loop
-      const originalRequest = error.config;
-      if (originalRequest._retry) {
-        router.push('/unauthorized');
-        return Promise.reject(error);
-      }
-
-      if (status === 403) {
-        try {
-          originalRequest._retry = true;
-
-          await refreshUserRoles();
-          return api(originalRequest); // retry with refreshed roles
-        } catch (refreshError) {
-          router.push('/unauthorized');
-        }
-      }
-
+      // 🔐 Handle 401 (unauthenticated)
       if (status === 401) {
         localStorage.clear();
         router.push('/');
+        return Promise.reject(error);
+      }
+
+      // 🔒 Handle 403 (forbidden)
+      if (status === 403) {
+        if (!originalRequest._retry) {
+          originalRequest._retry = true;
+          try {
+            await refreshUserRoles();
+            return api(originalRequest);
+          } catch (refreshErr) {
+            console.error('🔁 Failed to refresh roles:', refreshErr);
+          }
+        }
+
+        // Retry failed or didn't help → forbidden
+        router.push('/forbidden');
+        return Promise.reject(error);
       }
     }
 
     return Promise.reject(error);
   }
 );
+
 
 
 export default api;

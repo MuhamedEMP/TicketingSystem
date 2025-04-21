@@ -3,7 +3,7 @@
     <div class="overlay"></div>
   
     <div class="ticket-page">
-      <h1>Department Tickets</h1>
+      <h1>Received Tickets</h1>
   
       <div class="filter-bar">
         <input v-model="filters.search" placeholder="Search..." />
@@ -20,6 +20,13 @@
           <option value="Medium">Medium</option>
           <option value="High">High</option>
         </select>
+
+        <select v-model="filters.isAssigned">
+        <option value="">Assignment Status</option>
+        <option value="true">Assigned</option>
+        <option value="false">Unassigned</option>
+        </select>
+
   
         <input v-model="filters.assignedToName" placeholder="Assigned To" />
         <input v-model="filters.categoryName" placeholder="Category Name" />
@@ -75,16 +82,17 @@
   const tickets = ref([]);
   const noResults = ref(false);
   const filters = ref({
-    status: '',
-    urgency: '',
-    assignedToName: '',
-    categoryName: '',
-    departmentName: route.query.departmentName || '', 
-    fromDate: '',
-    toDate: '',
-    search: '',
-  });
-  
+  status: '',
+  urgency: '',
+  assignedToName: '',
+  categoryName: route.query.categoryName || '',
+  departmentName: route.query.departmentName || '',
+  fromDate: '',
+  toDate: '',
+  search: '',
+  isAssigned: ''
+});
+
   const fetchTickets = async () => {
     noResults.value = false;
     const params = new URLSearchParams();

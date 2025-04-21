@@ -38,3 +38,19 @@ export async function submitNewTicket(departmentId, categoryId, ticketData) {
     return response.data;
   }
   
+
+  export async function getResponsesToMyTickets(params = {}){
+    const query = new URLSearchParams();
+  
+    for (const key in params) {
+      if (params[key]) {
+        query.append(key, params[key]);
+      }
+    }
+
+     
+    const res = await api.get(`/user/myresponses?${query.toString()}`);
+    return res.data;
+  
+  }
+  

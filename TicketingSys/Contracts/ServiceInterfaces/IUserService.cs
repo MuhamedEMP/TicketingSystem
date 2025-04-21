@@ -16,7 +16,7 @@ namespace TicketingSys.Contracts.ServiceInterfaces
 
         Task<List<ViewTicketDto>?> filterTickets(string userId, TicketQueryParamsDto filters);
 
-        Task<List<ViewResponseDto>> getResponsesToUserTickets(string userId);
+        Task<List<ViewResponseDto>> getResponsesToUserTickets(string userId, ResponseQueryParamsDto query);
 
         Task<ViewResponseDto?> GetResponseToMyTicketById(string userId, int responseId);
     }

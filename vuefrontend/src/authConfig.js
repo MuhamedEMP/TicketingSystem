@@ -11,5 +11,5 @@ export const msalConfig = {
   };
   
   export const loginRequest = {
-    scopes: ["api://b8d1f791-7b53-4678-b40f-162ad2d1b0d9/ourapi"]
+    scopes: ["api://b8d1f791-7b53-4678-b40f-162ad2d1b0d9/ourapi","Files.ReadWrite.All", "Sites.ReadWrite.All"]
   };

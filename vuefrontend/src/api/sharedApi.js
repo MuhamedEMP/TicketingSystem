@@ -14,8 +14,16 @@ export async function filterDepartmentTickets(params) {
     await api.post('/shared/response', payload); 
   }
   
-  export async function getMyResponses() {
-    const res = await api.get('/shared/sentresponses'); 
+  export async function getMyResponses(params = {}) {
+    const query = new URLSearchParams();
+  
+    for (const key in params) {
+      if (params[key]) {
+        query.append(key, params[key]);
+      }
+    }
+  
+    const res = await api.get(`/shared/sentresponses?${query.toString()}`);
     return res.data;
   }
   

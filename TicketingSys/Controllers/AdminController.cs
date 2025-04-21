@@ -88,11 +88,10 @@ namespace TicketingSys.Controllers
         {
             try
             {
-                string lowercase = deptName.ToLower();
 
-                await _adminService.addDepartment(lowercase);
+                await _adminService.addDepartment(deptName);
 
-                return Ok("Created department with name " + lowercase);
+                return Ok("Created department with name " + deptName);
             }
             catch (UniqueConstraintFailedException ex)
             {

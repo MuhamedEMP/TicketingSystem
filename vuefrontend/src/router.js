@@ -15,6 +15,9 @@ import MyDepartments from './pages/DeptUserPages/MyDepartments.vue';
 import DepartmentTickets from './pages/DeptUserPages/DepartmentTickets.vue';
 import DeptViewTicket from './pages/DeptUserPages/DeptViewTicket.vue';
 import SentResponses from './pages/DeptUserPages/SentResponses.vue';
+import UploadFile from './pages/UploadFile.vue';
+import UserMyResponses from './pages/UserMyResponses.vue';
+
 
 const routes = [
   { path: '/unauthorized', component: Unauthorized },
@@ -109,6 +112,14 @@ const routes = [
     path: '/sentresponses',
     component: SentResponses,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/testupload',
+    component: UploadFile
+  },
+  {
+    path: '/myresponses',
+    component: UserMyResponses
   }
   
 ];

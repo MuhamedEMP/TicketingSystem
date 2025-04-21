@@ -22,7 +22,14 @@ namespace TicketingSys.RoleHandling.RoleHandlers
             var access = await _redisUtils.GetOrFetchAccess(userId);
             if (access == null) return;
 
-            if (!access.IsAdmin && access.HasDepartmentAccess)
+            // use this if you want dept users unable to have admin roles
+
+            //if (!access.IsAdmin && access.HasDepartmentAccess) 
+            //    context.Succeed(requirement);
+
+
+            // allows user to be admin and pass this policy if he has department access
+            if (access.HasDepartmentAccess) 
                 context.Succeed(requirement);
         }
 

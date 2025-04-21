@@ -121,6 +121,14 @@ namespace TicketingSys.Service
 
             queryable = queryable.Where(t => departmentIds.Contains(t.DepartmentId));
 
+            if (query.isAssigned.HasValue)
+            {
+                if (query.isAssigned.Value)
+                    queryable = queryable.Where(t => t.AssignedToId != null);
+                else
+                    queryable = queryable.Where(t => t.AssignedToId == null);
+            }
+
             if (!string.IsNullOrWhiteSpace(query.AssignedToName))
             {
                 string name = query.AssignedToName.ToLower();
@@ -140,7 +148,6 @@ namespace TicketingSys.Service
             }
 
 
-            // ✅ Apply optional query filters
             if (query.Status.HasValue)
                 queryable = queryable.Where(t => t.Status == query.Status.Value);
 
@@ -169,29 +176,76 @@ namespace TicketingSys.Service
             return sorted.Any() ? sorted.modelToViewDtoList() : null;
         }
 
-
-        public async Task<List<ViewResponseDto>> getResponsesSentByUser(string userId)
+        public async Task<List<ViewResponseDto>> getResponsesSentByUser(string userId, ResponseQueryParamsDto query)
         {
-            var responsesSentByUser = await _context.Responses
-            .Include(r => r.Ticket)
-                .ThenInclude(t => t.Category)
-            .Include(r => r.Ticket)
-                .ThenInclude(t => t.Department)
-            .Include(r => r.Ticket)
-                .ThenInclude(t => t.AssignedTo)
-            .Include(r => r.Ticket)
-                .ThenInclude(t => t.SubmittedBy)
-            .Include(r => r.Ticket)
-                .ThenInclude(t => t.Attachments)
-            .Include(r => r.User)
-            .Include(r => r.Attachments)
-            .Where(r => r.UserId == userId)
-            .ToListAsync();
+            var responses = _context.Responses
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.Category)
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.Department)
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.AssignedTo)
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.SubmittedBy)
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.Attachments)
+                .Include(r => r.User)
+                .Include(r => r.Attachments)
+                .Where(r => r.UserId == userId)
+                .AsQueryable();
 
-            var sorted = responsesSentByUser.SortByTicketStatusAndUrgency();
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                responses = responses.Where(r => r.Message.ToLower().Contains(query.Search.ToLower()));
+            }
+
+            if (query.Status.HasValue)
+            {
+                responses = responses.Where(r => r.Status == query.Status.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CategoryName))
+            {
+                var cat = query.CategoryName.ToLower();
+                responses = responses.Where(r => r.Ticket.Category.Name.ToLower().Contains(cat));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.DepartmentName))
+            {
+                var dept = query.DepartmentName.ToLower();
+                responses = responses.Where(r => r.Ticket.Department.Name.ToLower().Contains(dept));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.AssignedToName))
+            {
+                var assigned = query.AssignedToName.ToLower();
+                responses = responses.Where(r => r.Ticket.AssignedTo != null &&
+                                                 r.Ticket.AssignedTo.fullName.ToLower().Contains(assigned));
+            }
+
+            if (query.FromDate.HasValue)
+            {
+                responses = responses.Where(r => r.CreatedAt >= query.FromDate.Value);
+            }
+
+            if (query.ToDate.HasValue)
+            {
+                responses = responses.Where(r => r.CreatedAt <= query.ToDate.Value);
+            }
+
+            if (query.hasAttachments.HasValue)
+            {
+                responses = query.hasAttachments.Value
+                    ? responses.Where(r => r.Attachments.Any())
+                    : responses.Where(r => !r.Attachments.Any());
+            }
+
+            var resultList = await responses.ToListAsync();
+            var sorted = resultList.SortByTicketStatusAndUrgency();
 
             return sorted.Select(r => r.ToViewDto()).ToList();
         }
+
 
         // returns responses by the userId of the user who sent them
         public async Task<ViewResponseDto?> getSentResponseByUserIdAndResponseId(string userId, int responseId)

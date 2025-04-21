@@ -113,18 +113,76 @@ namespace TicketingSys.Service
         }
 
 
-        public async Task<List<ViewResponseDto>> getResponsesToUserTickets(string userId)
+        public async Task<List<ViewResponseDto>> getResponsesToUserTickets(string userId, ResponseQueryParamsDto query)
         {
-            var responsesToUserTickets = await _context.Responses
+            var responses = _context.Responses
                 .Include(r => r.Ticket)
-                .ThenInclude(t => t.SubmittedBy)
+                    .ThenInclude(t => t.SubmittedBy)
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.Category)
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.Department)
+                .Include(r => r.Ticket)
+                    .ThenInclude(t => t.AssignedTo)
                 .Include(r => r.User)
                 .Include(r => r.Attachments)
                 .Where(r => r.Ticket.SubmittedById == userId)
-                .ToListAsync();
+                .AsQueryable();
 
-            return responsesToUserTickets.Select(r => r.ToViewDto()).ToList();
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.ToLower();
+                responses = responses.Where(r => r.Message.ToLower().Contains(search));
+            }
+
+            if (query.Status.HasValue)
+            {
+                responses = responses.Where(r => r.Status == query.Status.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CategoryName))
+            {
+                var cat = query.CategoryName.ToLower();
+                responses = responses.Where(r => r.Ticket.Category.Name.ToLower().Contains(cat));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.DepartmentName))
+            {
+                var dept = query.DepartmentName.ToLower();
+                responses = responses.Where(r => r.Ticket.Department.Name.ToLower().Contains(dept));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.AssignedToName))
+            {
+                var assigned = query.AssignedToName.ToLower();
+                responses = responses.Where(r => r.Ticket.AssignedTo != null &&
+                                                 r.Ticket.AssignedTo.fullName.ToLower().Contains(assigned));
+            }
+
+            if (query.FromDate.HasValue)
+            {
+                responses = responses.Where(r => r.CreatedAt >= query.FromDate.Value);
+            }
+
+            if (query.ToDate.HasValue)
+            {
+                responses = responses.Where(r => r.CreatedAt <= query.ToDate.Value);
+            }
+
+
+            if (query.hasAttachments.HasValue)
+            {
+                responses = query.hasAttachments.Value
+                    ? responses.Where(r => r.Attachments.Any())
+                    : responses.Where(r => !r.Attachments.Any());
+            }
+
+            var resultList = await responses.ToListAsync();
+            var sorted = resultList.SortByTicketStatusAndUrgency();
+
+            return sorted.Select(r => r.ToViewDto()).ToList();
         }
+
 
 
         public async Task<ViewResponseDto?> GetResponseToMyTicketById(string userId, int responseId)

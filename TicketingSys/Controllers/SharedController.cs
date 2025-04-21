@@ -184,14 +184,14 @@ namespace TicketingSys.Controllers
         // get all responses i sent - HR and IT only
         [Authorize(Policy = "DepartmentUserOnly")]
         [HttpGet("sentresponses")]
-        public async Task<ActionResult<List<ViewResponseDto>>> getSentResponses()
+        public async Task<ActionResult<List<ViewResponseDto>>> getSentResponses([FromQuery] ResponseQueryParamsDto query)
         {
             var userId = _userUtils.getUserIdOr401();
 
-            var results = await _sharedService.getResponsesSentByUser(userId);
+            var results = await _sharedService.getResponsesSentByUser(userId, query);
 
-            if (results is null || results.Count == 0)
-                return NotFound("You have no sent  responses");
+            //if (results is null || results.Count == 0)
+            //    return NotFound("You have no sent  responses");
 
             return Ok(results);
         }

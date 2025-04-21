@@ -6,29 +6,38 @@
       <h1>Departments You Can Access</h1>
   
       <div v-if="departments.length && categories.length">
-        <div
-          v-for="dept in departments"
-          :key="dept.id"
-          class="department-block"
+      <div
+        v-for="dept in departments"
+        :key="dept.id"
+        class="department-block"
+      >
+        <router-link
+          :to="`/sharedtickets?departmentName=${dept.name}`"
+          class="department-link"
         >
-        <router-link :to="`/sharedtickets?departmentName=${dept.name}`" class="department-link">
-            <h2>{{ dept.name }}</h2>
+          <h2>{{ dept.name }}</h2>
         </router-link>
 
-          <p v-if="dept.description" class="dept-desc">{{ dept.description }}</p>
-  
-          <ul>
-            <li
-              v-for="cat in categoriesByDepartment(dept.id)"
-              :key="cat.id"
-              class="category-item"
+        <p v-if="dept.description" class="dept-desc">{{ dept.description }}</p>
+
+        <ul>
+          <li
+            v-for="cat in categoriesByDepartment(dept.id)"
+            :key="cat.id"
+            class="category-item"
+          >
+            <router-link
+              :to="`/sharedtickets?departmentName=${dept.name}&categoryName=${cat.name}`"
+              class="category-link"
             >
               {{ cat.name }}
               <span v-if="cat.description"> - {{ cat.description }}</span>
-            </li>
-          </ul>
-        </div>
+            </router-link>
+          </li>
+        </ul>
       </div>
+    </div>
+
   
       <p v-else>Loading your departments and categories...</p>
     </div>

@@ -43,6 +43,14 @@ const msal = new PublicClientApplication(msalConfig);
       },
     });
 
+    // FOR FILE UPLOAD USING GRAPH - IMPORTANT
+    const graphToken = await msal.acquireTokenSilent({
+      scopes: ["Files.ReadWrite.All", "Sites.ReadWrite.All"],
+      account: result.account,
+    });
+    localStorage.setItem("graphAccessToken", graphToken.accessToken);
+    
+
     if (userResponse.ok) {
       const user = await userResponse.json();
 

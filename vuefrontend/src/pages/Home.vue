@@ -54,8 +54,10 @@
     <div v-if="hasPolicy('AdminAndDepartmentUser')" class="home-page">
       <h1>Welcome, {{ firstName }}</h1>
       <h2>Shared Ticket View</h2>
-      <p>You have access admin and dept user stuff.</p>
-      <router-link to="/sharedtickets" class="button">View Tickets</router-link>
+      <p>You have admin role and department user roles. <br></p>
+        <router-link to="/admin" class="button">Go to Admin Panel</router-link> 
+        <br>     
+      <router-link to="/mydepartments" class="button">Go to My Departments</router-link>
     </div>
   </div>
 </template>

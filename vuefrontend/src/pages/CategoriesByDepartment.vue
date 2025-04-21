@@ -17,7 +17,7 @@
 
     <ul v-if="categories.length">
       <li v-for="cat in categories" :key="cat.name" class="category-item">
-        <div v-if="hasPolicy('AdminOnly')" style="display: inline-flex; gap: 0.5rem; align-items: center;">
+        <div v-if="hasPolicy('AdminOnly') || hasPolicy('AdminAndDepartmentUser') || hasPolicy('AdminOrDepartmentUser')" style="display: inline-flex; gap: 0.5rem; align-items: center;">
           <button @click="deleteCategory(cat.id)" class="button small-button delete-button">
             🗑️ Delete
           </button>
