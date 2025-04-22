@@ -6,6 +6,7 @@ import "./assets/css/navbar.css";
 import { router } from "./router.js";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { loginRequest, msalConfig } from "./authConfig";
+import api from "./utils/api.js";
 
 const msal = new PublicClientApplication(msalConfig);
 
@@ -26,82 +27,52 @@ const msal = new PublicClientApplication(msalConfig);
       account: result.account,
     });
 
-    localStorage.setItem("accessToken", tokenResponse.accessToken);
     const accessToken = tokenResponse.accessToken;
+    localStorage.setItem("accessToken", accessToken);
 
-    // Call /auth/register after login
-    await fetch("http://localhost:5172/auth/register", {
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
+    // 🔐 Register user on backend
+    await api.get("/auth/register");
 
-    // Fetch current user profile
-    const userResponse = await fetch("http://localhost:5172/shared/myprofile", {
-      headers: {
-        Authorization: `Bearer ${tokenResponse.accessToken}`,
-      },
-    });
-
-    // FOR FILE UPLOAD USING GRAPH - IMPORTANT
+    // 🔐 Save Graph access token for SharePoint uploads
     const graphToken = await msal.acquireTokenSilent({
       scopes: ["Files.ReadWrite.All", "Sites.ReadWrite.All"],
       account: result.account,
     });
     localStorage.setItem("graphAccessToken", graphToken.accessToken);
-    
 
-    if (userResponse.ok) {
-      const user = await userResponse.json();
+    try {
+      const { data: user } = await api.get("/shared/myprofile");
 
-      // 🔐 Save info to localStorage for rendering
       localStorage.setItem("userId", user.userId);
       localStorage.setItem("userFullName", user.fullName);
       localStorage.setItem("firstName", user.firstName);
       localStorage.setItem("isAdmin", JSON.stringify(user.isAdmin));
       localStorage.setItem("accessibleDepartments", JSON.stringify(user.accessibleDepartmentDtos || []));
 
-      // Mirror backend policy logic:
       const hasDeptAccess = user.accessibleDepartmentDtos?.length > 0;
       const grantedPolicies = [];
 
-      // AdminOnly handler logic
-      if (user.isAdmin && !hasDeptAccess) {
-        grantedPolicies.push("AdminOnly");
-      }
+      if (user.isAdmin && !hasDeptAccess) grantedPolicies.push("AdminOnly");
+      if (user.isAdmin && hasDeptAccess) grantedPolicies.push("AdminAndDepartmentUser");
+      if (user.isAdmin || hasDeptAccess) grantedPolicies.push("AdminOrDepartmentUser");
+      if (!user.isAdmin && hasDeptAccess) grantedPolicies.push("DepartmentUserOnly");
+      if (!user.isAdmin && !hasDeptAccess) grantedPolicies.push("RegularUserOnly");
 
-      if (user.isAdmin && hasDeptAccess) {
-        grantedPolicies.push("AdminAndDepartmentUser");
-      }
+      localStorage.setItem("grantedPolicies", JSON.stringify(grantedPolicies));
 
-      if (user.isAdmin || hasDeptAccess) {
-        grantedPolicies.push("AdminOrDepartmentUser");
-      }
-
-      // DepartmentUserOnly handler logic
-      if (!user.isAdmin && hasDeptAccess) {
-        grantedPolicies.push("DepartmentUserOnly");
-      }
-
-      // RegularUserOnly handler logic
-      if (!user.isAdmin && !hasDeptAccess) {
-        grantedPolicies.push("RegularUserOnly");
-      }
-
-localStorage.setItem("grantedPolicies", JSON.stringify(grantedPolicies));
-      // ✅ Route to proper dashboard
       if (grantedPolicies.includes("AdminOnly")) {
         router.push("/profile");
-        return;
+      } else {
+        router.push("/home");
       }
-
-      router.push("/home");
-      return;
+    } catch (error) {
+      console.error("❌ Failed to load user profile:", error);
     }
   }
 
+  // Fallback route for empty redirect result
   if (result && window.location.pathname === "/") {
     router.push("/home");
-    console.log("redirect ");
+    console.log("✅ Redirected to home.");
   }
 })();

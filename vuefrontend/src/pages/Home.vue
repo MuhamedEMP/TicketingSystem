@@ -77,17 +77,29 @@ const categories = ref([]);
 const firstName = localStorage.getItem("firstName");
 
 const categoriesByDepartment = (deptId) => {
-  return categories.value.filter(cat => cat.departmentId === deptId);
+  return Array.isArray(categories.value)
+    ? categories.value.filter(cat => cat?.departmentId === deptId)
+    : [];
 };
+
 
 onMounted(async () => {
   try {
-    departments.value = await getAllDepartments();
-    categories.value = await getAllCategories();
+    const [depts, cats] = await Promise.all([
+      getAllDepartments(),
+      getAllCategories()
+    ]);
+
+    console.log("✅ Departments:", depts);
+    console.log("✅ Categories:", cats);
+
+    departments.value = depts || [];
+    categories.value = Array.isArray(cats) ? cats : [];
   } catch (error) {
     console.error('❌ Failed to load departments or categories:', error);
   }
 });
+
 </script>
 
 <style scoped>

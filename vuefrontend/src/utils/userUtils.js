@@ -5,11 +5,8 @@ export const refreshUserRoles = async () => {
   const token = localStorage.getItem('accessToken');
   if (!token) return;
 
-  const res = await fetch('http://localhost:5172/shared/myprofile', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+
+  const res = await api.get('/shared/myprofile')
 
   if (!res.ok) throw new Error("Failed to refresh user profile");
 

@@ -3,7 +3,7 @@ import router from '../router';
 import { refreshUserRoles } from './userUtils';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5172',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 // Add token to every request
