@@ -6,5 +6,7 @@ namespace TicketingSys.Dtos.TicketDtos
     {
         [JsonIgnore]
         public string? UserId { get; set; }
+
+        public string? AssignedToId { get; set; }
     }
 }

@@ -36,8 +36,18 @@
         <label for="attachments">Attachments</label>
         <input type="file" multiple @change="handleFiles" />
       </div>
+      <ul class="upload-preview">
+  <li v-for="(file, index) in rawFiles" :key="index">
+    {{ file.name }}
+    <button class="delete-btn" @click.prevent="rawFiles.splice(index, 1)">❌</button>
+  </li>
+  
+</ul>
 
-      <button type="submit" class="submit-button">Submit Ticket</button>
+
+    <p v-if="isUploading" class="uploading-message">⏳ Uploading attachments, please wait...</p>
+    <button type="submit" class="submit-button" :disabled="isUploading">Submit Ticket</button>
+
     </form>
   </div>
 </template>
@@ -50,11 +60,16 @@ import UserNavbar from '../components/UserNavbar.vue';
 import { getDepartmentById } from '../api/departmentApi';
 import { getCategoryById } from '../api/categoryApi';
 import { onMounted } from 'vue';
-
+import { uploadToSharePoint } from '../api/sharepointUploader';
 
 const departmentName = ref('');
 const categoryName = ref('');
 const categoryDescription = ref('');
+const rawFiles = ref([]);
+const isUploading = ref(false);
+const handleFiles = (event) => {
+  rawFiles.value = [...event.target.files];
+};
 
 const route = useRoute();
 
@@ -67,13 +82,6 @@ const ticket = ref({
   description: '',
   attachments: [],
 });
-const handleFiles = (event) => {
-  const files = event.target.files;
-  ticket.value.attachments = Array.from(files).map(file => ({
-    fileName: file.name
-    // fileData: file,  -- RESOLVE WHEN BLOB STORAGE IS ADDED
-  }));
-};
 
 
 
@@ -82,19 +90,41 @@ const resetForm = () => {
     ticket.value.urgency = 0;
     ticket.value.description = '';
     ticket.value.attachments = [];
+    rawFiles.value = [];
+
   
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = '';
   };
 
 
+
+
   const submitTicket = async () => {
+  isUploading.value = true;
   try {
-    await submitNewTicket(departmentId, categoryId, ticket.value);
+    const uploaded = [];
+    for (const file of rawFiles.value) {
+      const url = await uploadToSharePoint(file);
+      uploaded.push({
+        Path: url,
+        Filename: file.name,
+        ContentType: file.type
+      });
+    }
+
+    const payload = {
+      ...ticket.value,
+      attachments: uploaded
+    };
+
+    await submitNewTicket(departmentId, categoryId, payload);
     alert("Ticket submitted!");
     resetForm();
   } catch (error) {
     console.error("Failed to submit ticket:", error);
+  } finally {
+    isUploading.value = false;
   }
 };
 
@@ -115,6 +145,15 @@ onMounted(async () => {
   
   <style scoped>
     @import '../assets/css/newticket.css';
+
+    .uploading-message {
+  color: #ffd966;
+  font-style: italic;
+  font-size: 0.95rem;
+  margin-top: -0.8rem;
+  margin-bottom: -0.5rem;
+}
+
     .category-description {
   margin-top: 0.5rem;
   padding: 0.75rem;

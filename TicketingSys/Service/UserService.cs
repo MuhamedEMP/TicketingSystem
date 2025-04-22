@@ -33,11 +33,12 @@ namespace TicketingSys.Service
         {
             // includes object references by FK
             return await _context.Tickets.Include(t => t.SubmittedBy)
-            .Include(t => t.AssignedTo)
-            .Include(t => t.Category)
-            .Include(t => t.Department)
-            .Include(t => t.Attachments)
-            .Include(t => t.Responses)
+                .Include(t => t.AssignedTo)
+                .Include(t => t.Category)
+                .Include(t => t.Department)
+                .Include(t => t.Attachments)
+                .Include(t => t.Responses)
+                    .ThenInclude(r=> r.Attachments) // include response attachments too
             .FirstOrDefaultAsync(t => t.Id == ticketId && t.SubmittedById == userId);
         }
 
@@ -97,6 +98,22 @@ namespace TicketingSys.Service
 
             if (filters.ToDate.HasValue)
                 query = query.Where(t => t.CreatedAt <= filters.ToDate.Value);
+
+
+            if (filters.hasResponses == true)
+                query = query.Where(t=> t.Responses!=null && t.Responses.Count()>0);
+
+            if(filters.hasResponses == false)
+                query = query.Where(t => t.Responses == null || t.Responses.Count() == 0);
+
+            //if (filters.hasResponses.HasValue)
+            //{
+            //    if (filters.hasResponses.Value)
+            //        query = query.Where(t => (t.Responses?.Count ?? 0) > 0);
+            //    else
+            //        query = query.Where(t => t.Responses == null || t.Responses.Count == 0);
+            //}
+
 
             if (!string.IsNullOrWhiteSpace(filters.Search))
             {

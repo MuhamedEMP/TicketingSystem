@@ -116,6 +116,7 @@ namespace TicketingSys.Service
                 .Include(t => t.Category)
                 .Include(t => t.Department)
                 .Include(t => t.Attachments)
+                .Include(t => t.Responses)
                 .AsQueryable();
 
 
@@ -164,6 +165,18 @@ namespace TicketingSys.Service
 
             if (query.ToDate.HasValue)
                 queryable = queryable.Where(t => t.CreatedAt <= query.ToDate.Value);
+
+
+            if (query.hasResponses == true)
+                queryable = queryable.Where(t => t.Responses != null && t.Responses.Count() > 0);
+
+            if (query.hasResponses == false)
+                queryable = queryable.Where(t => t.Responses == null || t.Responses.Count() == 0);
+
+            if (!string.IsNullOrWhiteSpace(query.AssignedToId))
+                queryable = queryable.Where(t => t.AssignedToId == query.AssignedToId);
+
+
 
             if (!string.IsNullOrWhiteSpace(query.Search))
                 queryable = queryable.Where(t =>
@@ -270,6 +283,8 @@ namespace TicketingSys.Service
             .Include(t => t.Category)
             .Include(t => t.Department)
             .Include(t => t.Attachments)
+            .Include(t=> t.Responses)
+             .ThenInclude(r => r.Attachments) // include response attachments
             .FirstOrDefaultAsync(t => t.Id == ticketId && t.SubmittedById == userId);
         }
 
@@ -281,7 +296,8 @@ namespace TicketingSys.Service
                 .Include(t => t.Category)
                 .Include(t => t.Department)
                 .Include(t => t.Attachments)
-                .Include(t=> t.Responses)
+                .Include(t => t.Responses)
+                     .ThenInclude(r => r.Attachments) // include response attachments
                 .FirstOrDefaultAsync(t => t.Id == ticketId);
 
             if (ticket == null)

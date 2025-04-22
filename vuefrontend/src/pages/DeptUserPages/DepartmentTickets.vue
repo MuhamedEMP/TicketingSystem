@@ -6,6 +6,7 @@
       <h1>Received Tickets</h1>
   
       <div class="filter-bar">
+
         <input v-model="filters.search" placeholder="Search..." />
         <select v-model="filters.status">
           <option value="">Status</option>
@@ -13,12 +14,22 @@
           <option value="Resolved">Resolved</option>
           <option value="Closed">Closed</option>
         </select>
+
+        
   
         <select v-model="filters.urgency">
           <option value="">Urgency</option>
           <option value="Low">Low</option>
           <option value="Medium">Medium</option>
           <option value="High">High</option>
+        </select>
+
+        
+        <label for="">Responses</label>
+            <select v-model="filters.hasResponses">
+              <option value="">All</option>
+            <option value="true">With Responses</option>
+            <option value="false">No Responses</option>
         </select>
 
         <select v-model="filters.isAssigned">
@@ -38,7 +49,16 @@
         <input type="date" v-model="filters.toDate" />
   
         <button @click="fetchTickets">Apply Filters</button>
+        <button @click="filterAssignedToMe" class="assigned-to-me-btn">
+        Assigned to Me Only
+        </button>
+        <button @click="resetFilters" class="reset-filters-btn">
+        Reset Filters
+    </button>
       </div>
+
+
+
   
       <div v-if="noResults && tickets.length === 0" class="no-tickets">
         No department tickets found.
@@ -56,6 +76,11 @@
             <span>Category: {{ ticket.categoryName }}</span>
             <span>Department: {{ ticket.departmentName }}</span>
             <span>Submitted: {{ new Date(ticket.createdAt).toLocaleString() }}</span>
+            <span>
+            <div class="responses-text">     
+                {{ ticket.responsesCount > 0 ? `Number of Responses: ${ticket.responsesCount}` : 'No responses' }}
+            </div>
+            </span>
             <span>
               Updated:
               {{
@@ -79,19 +104,49 @@
   const route = useRoute();
   const router = useRouter();
 
+  const filterAssignedToMe = () => {
+  const userId = localStorage.getItem('userId'); // adjust if your key is different
+  if (userId) {
+    filters.value.assignedToId = userId;
+    fetchTickets();
+  }
+};
+
+
   const tickets = ref([]);
   const noResults = ref(false);
   const filters = ref({
   status: '',
   urgency: '',
   assignedToName: '',
+  assignedToId: '', 
   categoryName: route.query.categoryName || '',
   departmentName: route.query.departmentName || '',
   fromDate: '',
   toDate: '',
   search: '',
-  isAssigned: ''
+  isAssigned: '',
+  hasResponses: ''
 });
+
+const resetFilters = () => {
+  filters.value = {
+    status: '',
+    urgency: '',
+    assignedToName: '',
+    assignedToId: '',
+    categoryName: '',
+    departmentName: '',
+    fromDate: '',
+    toDate: '',
+    search: '',
+    isAssigned: '',
+    hasResponses: ''
+  };
+
+  fetchTickets();
+};
+
 
   const fetchTickets = async () => {
     noResults.value = false;
@@ -117,5 +172,36 @@
   onMounted(fetchTickets);
   </script>
   
-  <style src="../../assets/css/tickets.css"></style>
+  <style src="../../assets/css/tickets.css">
+.assigned-to-me-btn {
+  background-color: #42b983;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.assigned-to-me-btn:hover {
+  background-color: #36966e;
+}
+
+.reset-filters-btn {
+  background-color: #555;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.reset-filters-btn:hover {
+  background-color: #777;
+}
+
+</style>
   

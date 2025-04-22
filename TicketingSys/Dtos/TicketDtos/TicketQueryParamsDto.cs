@@ -13,6 +13,7 @@ namespace TicketingSys.Dtos.TicketDtos
         public DateTime? ToDate { get; set; }
         public string? Search { get; set; }
         public bool? isAssigned {  get; set; }
+        public bool? hasResponses { get; set; }
     }
     
 }

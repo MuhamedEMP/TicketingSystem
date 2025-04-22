@@ -20,17 +20,20 @@
           <span><strong>Updated:</strong> {{ formatDate(ticket.updatedAt) }}</span>
         </div>
         <div v-if="ticket.attachmentPaths?.length" class="ticket-attachments">
-          <h3>Attachments</h3>
-          <ul>
+        <h3>📎 Attachments</h3>
+        <ul>
             <li v-for="(file, index) in ticket.attachmentPaths" :key="index">
-              <a :href="file" target="_blank">{{ file }}</a>
+            <a :href="file" target="_blank">
+                {{ getFileName(file) }}
+            </a>
             </li>
-          </ul>
+        </ul>
         </div>
+
       </div>
 
       <!-- Add Response Form -->
-      <div v-if="hasPolicy('DepartmentUserOnly')" class="add-response-form">
+      <div v-if="hasPolicy('DepartmentUserOnly') || hasPolicy('AdminAndDepartmentUser')" class="add-response-form">
         <h3>Add a Response</h3>
         <form @submit.prevent="submitResponse">
           <textarea v-model="newResponse.message" placeholder="Enter your response..." required></textarea>
@@ -76,11 +79,17 @@
               <span class="response-time">— {{ formatDate(response.createdAt) }}</span>
             </div>
             <p class="response-message">{{ response.message }}</p>
-            <ul v-if="response.attachmentUrls?.length" class="response-attachments">
-              <li v-for="(path, index) in response.attachmentUrls" :key="index">
-                <a :href="path" target="_blank">{{ path }}</a>
-              </li>
-            </ul>
+            <div v-if="response.attachmentUrls?.length" class="response-attachments">
+          <h4>📎 Attachments</h4>
+          <ul>
+            <li v-for="(path, index) in response.attachmentUrls" :key="index">
+              <a :href="path" target="_blank">{{ getFileName(path) }}</a>
+            </li>
+          </ul>
+        </div>
+        <div v-else class="response-attachments">
+          <p>No Attachments</p>
+        </div>
             <p v-if="response.status" class="response-status">
               <em>Ticket Status: {{ response.status }}</em>
             </p>
@@ -92,6 +101,9 @@
       <div v-else-if="error" class="error-message">{{ error }}</div>
       <div v-else class="ticket-meta">Loading ticket...</div>
     </div>
+
+    
+    
 </template>
 
 <script setup>
@@ -107,6 +119,13 @@ const ticket = ref(null);
 const error = ref(null);
 const selectedFiles = ref([]);
 const isUploading = ref(false);
+const getFileName = (url) => {
+  try {
+    return decodeURIComponent(url.split('/').pop().split('?')[0]);
+  } catch {
+    return "Attachment";
+  }
+};
 
 const newResponse = ref({
   ticketId: null,
@@ -123,6 +142,8 @@ const fetchTicket = async () => {
     ticket.value = await getSharedTicketById(id);
 
     ticket.value.responses = ticket.value.viewResponses;
+
+    console.log(ticket.value)
   } catch (err) {
     error.value = err.message || 'Failed to load ticket.';
   }
@@ -197,6 +218,17 @@ const submitResponse = async () => {
 </script>
 
 <style scoped>
+.ticket-attachments a {
+  color: #42b983;
+  text-decoration: underline;
+  word-break: break-word;
+}
+.ticket-attachments h3 {
+  margin-bottom: 0.5rem;
+  color: #aaa;
+}
+
+
 .upload-area {
   background-color: #1f1f1f;
   border: 2px dashed #42b983;

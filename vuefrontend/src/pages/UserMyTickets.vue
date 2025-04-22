@@ -21,6 +21,13 @@
               <option value="High">High</option>
             </select>
 
+            <label for="">Responses</label>
+            <select v-model="filters.hasResponses">
+              <option value="">All</option>
+            <option value="true">With Responses</option>
+            <option value="false">No Responses</option>
+            </select>
+
           <input v-model="filters.assignedToName" placeholder="Assigned To" />
 
           <input v-model="filters.categoryName" placeholder="Category Name" />
@@ -84,6 +91,7 @@ const filters = ref({
   fromDate: '',
   toDate: '',
   search: '',
+  hasResponses: ''
 });
 
 const fetchTickets = async () => {
