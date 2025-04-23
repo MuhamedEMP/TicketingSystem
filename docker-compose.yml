@@ -10,8 +10,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=ticketingdb;Username=postgres;Password=postgres
-      - Redis__ConnectionString=redis:6379
+      - ConnectionStrings__RedisConnection=redis:6379
       - ASPNETCORE_URLS=http://+:5172
+      - SEED_ADMIN_USERID=mqNr3RairkbRu-6IzRG66hDYJe97qAIofhD7CG3Kvo0
+      - SEED_IN_DOCKER=true
+      - SEED_ADMIN_EMAIL=bakir.mehremic@emediapatch.com
+      - SEED_ADMIN_FIRSTNAME=Bakir
+      - SEED_ADMIN_LASTNAME=Mehremic
     depends_on:
       - postgres
       - redis

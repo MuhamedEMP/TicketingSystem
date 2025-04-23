@@ -131,11 +131,19 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// apply migrations on startup
+// apply migrations on startup when in docker and add default admin user
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate(); 
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    
+    if (config["SEED_IN_DOCKER"] == "true")
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<DbSeeder>>();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        db.Database.Migrate(); 
+        DbSeeder.Seed(db, config, logger); 
+    }
 }
 
 

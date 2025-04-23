@@ -10,7 +10,7 @@
           <h2><RouterLink to="/admin/adddepartment">Add Department</RouterLink></h2>
         </div>
   
-        <div v-if="departments.length && categories.length">
+        <div v-if="departments.length">
           <div
             v-for="dept in departments"
             :key="dept.id"
