@@ -5,6 +5,7 @@
 
     <!-- 👤 Regular Users (no admin or department access) -->
     <div v-if="hasPolicy('RegularUserOnly')" class="home-page">
+      <h1>TEST</h1>
       <h1>Send New Ticket</h1>
 
       <div v-if="departments.length && categories.length">

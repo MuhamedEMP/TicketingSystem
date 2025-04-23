@@ -6,14 +6,16 @@ services:
       context: .
       dockerfile: backend.Dockerfile
     ports:
-      - "5000:8080"
+      - "5172:5172"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Default=Host=postgres;Database=ticketingdb;Username=postgres;Password=postgres
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=ticketingdb;Username=postgres;Password=postgres
       - Redis__ConnectionString=redis:6379
+      - ASPNETCORE_URLS=http://+:5172
     depends_on:
       - postgres
       - redis
+      
 
   frontend:
     build:
@@ -21,6 +23,8 @@ services:
       dockerfile: frontend.Dockerfile
     ports:
       - "5173:5173"
+    environment:
+    - VITE_API_BASE_URL=http://localhost:5172
     depends_on:
       - backend
 
