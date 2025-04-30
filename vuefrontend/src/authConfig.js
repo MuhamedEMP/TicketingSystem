@@ -1,6 +1,6 @@
 export const msalConfig = {
     auth: {
-      clientId: "b8d1f791-7b53-4678-b40f-162ad2d1b0d9",
+      clientId: "137dd5ce-0c3a-40f3-af94-a03853de9572",
       authority: "https://login.microsoftonline.com/b3b27808-2559-44a8-8443-365d492c7436",
       redirectUri: "http://localhost:5173/"// Or your deployed URL
     },
@@ -11,5 +11,5 @@ export const msalConfig = {
   };
   
   export const loginRequest = {
-    scopes: ["api://b8d1f791-7b53-4678-b40f-162ad2d1b0d9/ourapi","Files.ReadWrite.All", "Sites.ReadWrite.All"]
-  };
+    scopes: ["api://137dd5ce-0c3a-40f3-af94-a03853de9572/ourapi","Files.ReadWrite.All", "Sites.ReadWrite.All"]
+  }; // adi promjene
