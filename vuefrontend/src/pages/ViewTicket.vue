@@ -104,7 +104,7 @@ onMounted(fetchTicket);
 }
 
 .ticket-card {
-  background-color: #2a2a2a;
+  background-color: white;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -112,25 +112,26 @@ onMounted(fetchTicket);
 }
 
 .ticket-card h1 {
-  color: whitesmoke;
+  color: black;
   margin-bottom: 1rem;
 }
 
 .ticket-description {
   font-size: 1.1rem;
   margin-bottom: 1.5rem;
-  color: #ccc;
+  color: black;
 }
 
 .ticket-meta span {
   display: block;
   margin-bottom: 0.5rem;
-  color: #bbb;
+  color: black;
 }
 
 .ticket-attachments ul,
 .response-attachments {
   list-style: none;
+  color: black;
   padding-left: 1rem;
 }
 
@@ -141,44 +142,43 @@ onMounted(fetchTicket);
 }
 
 .response-section {
-  background-color: #1f1f1f;
+  background-color: white;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .response-section h2 {
-  color: #42b983;
+  color: black;
   margin-bottom: 1.2rem;
 }
 
 .ticket-response {
-  background-color: #2e2e2e;
+  background-color: white;
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1.2rem;
-  border-left: 4px solid #42b983;
 }
 
 .response-header {
   font-weight: bold;
   margin-bottom: 0.5rem;
-  color: #eee;
+  color: black;
 }
 
 .response-time {
   font-weight: normal;
-  color: #888;
+  color: black;
   margin-left: 0.5rem;
 }
 
 .response-message {
-  color: #ccc;
+  color: black;
   margin-bottom: 0.5rem;
 }
 
 .response-status {
-  color: #aaa;
+  color: black;
   font-style: italic;
 }
 

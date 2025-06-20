@@ -1,21 +1,5 @@
 <template>
-    <nav class="navbar">
-      <div class="brand-title">eMedia</div>
-  
-      <div class="nav-links button-container">
-        <router-link v-if="notHome" to="/home" class="button small-button">Home</router-link>
-        <router-link v-if="notAdmin" to="/home" class="button small-button">Admin Panel</router-link>
-        <!-- User icon dropdown -->
-        <div class="user-menu" @click="toggleDropdown">
-          <img src="../../assets/user-icon.png" alt="User" class="user-icon" />
-  
-          <div v-if="dropdownOpen" class="dropdown">
-            <router-link to="/profile" class="dropdown-item">Profile</router-link>
-            <button @click="logout" class="dropdown-item logout">Logout</button>
-          </div>
-        </div>
-      </div>
-    </nav>
+    
   </template>
 
 <script setup>
@@ -48,7 +32,7 @@ const logout = () => {
   justify-content: space-between;
   align-items: center;
   padding: 0 1.2rem;
-  height: 60px;
+  height: 80px;
   background-color: #1f1f1f;
   border-bottom: 1px solid #333;
 }

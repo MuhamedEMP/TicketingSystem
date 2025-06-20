@@ -1,73 +1,64 @@
 <template>
-  <nav class="navbar">
-    <div class="brand-title">eMedia</div>
-
-    <div class="nav-links button-container">
-      <router-link v-if="notHome" to="/home" class="button small-button">Home</router-link>
-
-        <router-link
-        v-if="hasPolicy('AdminOnly') || hasPolicy('AdminAndDepartmentUser')"
-        to="/admin"
-        class="button small-button"
-      >
-        Admin Panel
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      
+      <router-link to="/home" class="logo-link">
+        <img src="../assets/eMediaLogo.png" alt="eMedia Patch Logo" class="sidebar-logo"/>
       </router-link>
 
+      <div class="nav-icons">
+      <button v-if="notMyTickets && hasPolicy('RegularUserOnly')" >
+        <router-link to="/user/mytickets" class = "button-tickets">
+          <i class="ai-clipboard"></i> 
+        </router-link>
+      </button>
 
-    <router-link
-        v-if="notMyTickets && hasPolicy('RegularUserOnly')"
-        to="/user/mytickets"
-        class="button small-button"
-      >
-        My Tickets
-      </router-link>
-
-      <router-link
-        v-if="notMyResponses && hasPolicy('RegularUserOnly')"
-        to="/myresponses"
-        class="button small-button"
-      >
-        My Responses
-      </router-link>
+      <button v-if="notMyResponses && hasPolicy('RegularUserOnly')" >
+        <router-link to = "/myresponses" class = "button-tickets">
+          <i class="ai-chat-approve"></i>
+        </router-link>
+      </button>
+      
+      <button>
+        <router-link to = "/profile" class = "button-tickets">
+          <i class="ai-person"></i>
+        </router-link>
+      </button>
+      </div>
 
       <!-- ✅ Show to admins OR department users -->
-      <router-link
-        v-if="hasPolicy('DepartmentUserOnly') && !isOnSharedTickets"
-        to="/sharedtickets"
-        class="button small-button"
-      >
-        My Tickets
-      </router-link>
+      <button>
+        <router-link v-if="hasPolicy('DepartmentUserOnly') && !isOnSharedTickets" to="/sharedtickets" class = "button-tickets">
+          <i class="ai-clipboard"></i> 
+        </router-link>
+      </button>
 
-        <!-- ✅ Show to admins OR department users -->
-        <router-link
-        v-if="hasPolicy('DepartmentUserOnly') && !isOnMyDepartments"
-        to="/mydepartments"
-        class="button small-button"
-      >
-        Departments
-      </router-link>
+      <!-- ✅ Show to admins OR department users -->
+      <button>
+        <router-link v-if="hasPolicy('DepartmentUserOnly') && !isOnSharedTickets" to="/mydepartments" class = "button-tickets">
+          <i class="ai-people-group"></i>
+        </router-link>
+      </button>
 
       <!-- ✅ Show to department users -->
-      <router-link
-        v-if="hasPolicy('DepartmentUserOnly') && !isOnSentResponses"
-        to="/sentresponses"
-        class="button small-button"
-      >
-        Responses
-      </router-link>
+      <button>
+        <router-link v-if="hasPolicy('DepartmentUserOnly') && !isOnSharedTickets" to="/sentresponses" class = "button-tickets">
+          <i class="ai-envelope"></i>
+        </router-link>
+      </button>
 
-      <!-- User icon dropdown -->
-      <div class="user-menu" @click="toggleDropdown">
-        <img src="../assets/user-icon.png" alt="User" class="user-icon" />
-
-        <div v-if="dropdownOpen" class="dropdown">
-          <router-link to="/profile" class="dropdown-item">Profile</router-link>
-          <button @click="logout" class="dropdown-item logout">Logout</button>
-        </div>
+      <div class="left-logout">
+        <button @click="logout">
+          <i class="ai-sign-out"></i>
+        </button>
       </div>
+
+
+
+    
+      
     </div>
-  </nav>
+  </aside>
 </template>
 <script setup>
 import {  ref } from 'vue';
@@ -95,76 +86,13 @@ const logout = () => {
   router.push('/');
 };
 
+
 </script>
 
 
 
 <style scoped>
-@import '../assets/css/navbar.css';
-@import '../assets/css/custom.css';
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 1.2rem;
-  height: 60px;
-  background-color: #1f1f1f;
-  border-bottom: 1px solid #333;
-}
-
-.nav-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.user-menu {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-left: 0.5rem;
-  padding: 0.2rem;
-}
-
-.user-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #666;
-}
-
-.dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
-  background: #333;
-  border: 1px solid #444;
-  border-radius: 5px;
-  min-width: 140px;
-  z-index: 100;
-}
-
-.dropdown-item {
-  display: block;
-  padding: 0.5rem 1rem;
-  text-align: left;
-  color: #eee;
-  background: none;
-  text-decoration: none;
-  border: none;
-  width: 100%;
-  cursor: pointer;
-}
-
-.dropdown-item:hover {
-  background-color: #444;
-}
-
-.logout {
-  color: #f77;
-}
+@import '../assets/css/sidebar.css';
 
 </style>

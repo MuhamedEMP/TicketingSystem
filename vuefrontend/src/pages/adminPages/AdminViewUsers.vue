@@ -4,28 +4,32 @@
     <h1>All Registered Users</h1>
 
     <!-- 🔍 Multi-field search -->
+
+    <div class="checkbox-new">
+      <div class="checkbox-wrapper-4">
+        <input class="inp-cbx" id="admin" type="checkbox" v-model="query.isAdmin" :true-value="true" :false-value="null" />
+        <label class="cbx" for="admin"><span>
+          <svg width="12px" height="10px">
+            <use xlink:href="#check-4"></use>
+          </svg></span><span>Admin</span>
+        </label>
+    </div>
+
+
+</div>
+
     <div class="search-form">
       <input v-model="query.firstName" placeholder="First Name" />
       <input v-model="query.lastName" placeholder="Last Name" />
       <input v-model="query.email" placeholder="Email" />
 
-      <div class="checkbox-row">
-      <label class="checkbox-item">
-        <input type="checkbox" v-model="query.isAdmin" :true-value="true" :false-value="null" />
-        Admin User
-      </label>
-
-      <label class="checkbox-item">
-        <input type="checkbox" v-model="query.hasDepartments" :true-value="true" :false-value="null" />
-        Has Department Access
-      </label>
+        <div class="checkbox-row">
     </div>
-
-
-
       <button @click="searchUsers">Search</button>
       <button @click="resetFilters" v-if="isFiltering" class="reset-button">Reset</button>
     </div>
+
+    
 
     <table>
       <thead>
@@ -135,7 +139,7 @@ const resetFilters = async () => {
 .checkbox-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem; /* tighter spacing between checkbox and label text */
+  gap: 0; /* tighter spacing between checkbox and label text */
   font-size: 0.95rem;
   padding: 0.2rem 0.5rem; /* less horizontal padding */
   background-color: #2a2a2a;
@@ -191,8 +195,6 @@ h1 {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-  background-color: #1e1e1e;
-  padding: 1rem;
   border-radius: 8px;
 }
 
@@ -201,13 +203,13 @@ h1 {
   min-width: 180px;
   border-radius: 6px;
   border: 1px solid #444;
-  background-color: #2a2a2a;
-  color: #eee;
+  background-color: white;
+  color: black;
 }
 
 .search-form button {
   padding: 0.6rem 1.2rem;
-  background-color: #3a8ee6;
+  background-color: #ca0176;
   color: white;
   border: none;
   border-radius: 6px;
@@ -216,7 +218,8 @@ h1 {
 }
 
 .search-form button:hover {
-  background-color: #2a6fb4;
+  background-color: white;
+  color: #ca0176;
 }
 
 .reset-button {
@@ -232,7 +235,7 @@ h1 {
 table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #1f1f1f;
+  background-color: white;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
@@ -246,7 +249,7 @@ th, td {
   padding: 0.85rem;
   border: 1px solid #333;
   text-align: left;
-  color: #ddd;
+  color: black;
 }
 
 th {
@@ -261,17 +264,17 @@ td ul {
 
 td li {
   list-style-type: disc;
-  color: #bbb;
+  color: black;
 }
 
 a {
-  color: #4ea5f3;
+  color: #ca0176;
   text-decoration: none;
   font-weight: 500;
 }
 
 a:hover {
-  text-decoration: underline;
+  color: black;
 }
 
 

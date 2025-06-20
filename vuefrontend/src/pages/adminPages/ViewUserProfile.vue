@@ -138,11 +138,11 @@ const setAsUserOnly = async () => {
 <style scoped>
 .profile-page {
   padding: 2rem;
-  color: #eee;
+  color: black;
 }
 
 .profile-card {
-  background-color: #2b2b2b;
+  background-color: white;
   padding: 1.5rem;
   border-radius: 12px;
   max-width: 600px;
@@ -152,20 +152,20 @@ const setAsUserOnly = async () => {
 
 .access-summary {
   margin-top: 1rem;
-  background: #333;
+  background: white;
   padding: 1rem;
   border-radius: 8px;
 }
 
 .access-summary ul {
   margin-left: 1.5rem;
-  color: #ccc;
+  color: black;
 }
 
 .access-editor {
   margin-top: 2rem;
   padding: 1rem;
-  background-color: #1f1f1f;
+  background-color: white;
   border-radius: 10px;
 }
 
@@ -180,7 +180,7 @@ const setAsUserOnly = async () => {
 .checkbox {
   display: inline-block;
   margin: 0.25rem 1rem 0.25rem 0;
-  color: #ddd;
+  color: black;
 }
 
 .action-buttons {
@@ -197,12 +197,12 @@ const setAsUserOnly = async () => {
 }
 
 .save-btn {
-  background-color: #3a8ee6;
+  background-color: #ca0176;
   color: white;
 }
 
 .user-only-btn {
-  background-color: #777;
+  background-color: #ca0176;
   color: white;
 }
 </style>

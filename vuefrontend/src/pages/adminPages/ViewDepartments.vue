@@ -7,7 +7,7 @@
         <h1>Existing Departments and Categories</h1>
   
         <div>
-          <h2><RouterLink to="/admin/adddepartment">Add Department</RouterLink></h2>
+          <h2><RouterLink to="/admin/adddepartment" class="add-link">Add Department</RouterLink></h2>
         </div>
   
         <div v-if="departments.length">
@@ -17,7 +17,7 @@
             class="department-block"
           >
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <router-link
+              <router-link style="text-decoration: none;" 
                 :to="`/department/${dept.id}/categories`"
                 class="department-link"
               >
@@ -120,7 +120,7 @@ const deleteDepartment = async (deptId) => {
   
   .department-block {
     margin-bottom: 2rem;
-    background-color: #2a2a2a;
+    background-color: white;
     padding: 1rem;
     border-radius: 10px;
   }
@@ -133,18 +133,18 @@ const deleteDepartment = async (deptId) => {
   .category-item {
     margin-left: 1rem;
     padding: 0.4rem;
-    color: #ccc;
+    color: black;
   }
   
   .department-link h2 {
     margin-bottom: 0.5rem;
-    color: #fff;
+    color: black;
     text-decoration: none;
   }
   
   .department-link h2:hover {
-    color: #42b983;
-    text-decoration: underline;
+    color: #ca0176;
+    text-decoration: none;
   }
   
   .category-link {
@@ -154,7 +154,7 @@ const deleteDepartment = async (deptId) => {
   }
   
   .category-link:hover {
-    text-decoration: underline;
+    text-decoration: none;
     color: #42b983;
   }
   .delete-dept-button {

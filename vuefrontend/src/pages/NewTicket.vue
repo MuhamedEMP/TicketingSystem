@@ -36,30 +36,27 @@
         <label for="attachments">Attachments</label>
         <input type="file" multiple @change="handleFiles" />
       </div>
+
       <ul class="upload-preview">
-  <li v-for="(file, index) in rawFiles" :key="index">
-    {{ file.name }}
-    <button class="delete-btn" @click.prevent="rawFiles.splice(index, 1)">❌</button>
-  </li>
-  
-</ul>
+        <li v-for="(file, index) in rawFiles" :key="index">
+          {{ file.name }}
+          <button class="delete-btn" @click.prevent="rawFiles.splice(index, 1)">❌</button>
+        </li>
+      </ul>
 
-
-    <p v-if="isUploading" class="uploading-message">⏳ Uploading attachments, please wait...</p>
-    <button type="submit" class="submit-button" :disabled="isUploading">Submit Ticket</button>
-
+      <p v-if="isUploading" class="uploading-message">⏳ Uploading attachments, please wait...</p>
+      <button type="submit" class="submit-button" :disabled="isUploading">Submit Ticket</button>
     </form>
   </div>
 </template>
 
-  <script setup>
-import { ref } from 'vue';
+<script setup>
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { submitNewTicket } from '../api/userApi';
 import UserNavbar from '../components/UserNavbar.vue';
 import { getDepartmentById } from '../api/departmentApi';
 import { getCategoryById } from '../api/categoryApi';
-import { onMounted } from 'vue';
 import { uploadToSharePoint } from '../api/sharepointUploader';
 
 const departmentName = ref('');
@@ -67,12 +64,8 @@ const categoryName = ref('');
 const categoryDescription = ref('');
 const rawFiles = ref([]);
 const isUploading = ref(false);
-const handleFiles = (event) => {
-  rawFiles.value = [...event.target.files];
-};
 
 const route = useRoute();
-
 const departmentId = parseInt(route.params.departmentId);
 const categoryId = parseInt(route.params.categoryId);
 
@@ -83,24 +76,22 @@ const ticket = ref({
   attachments: [],
 });
 
-
+const handleFiles = (event) => {
+  rawFiles.value = [...event.target.files];
+};
 
 const resetForm = () => {
-    ticket.value.title = '';
-    ticket.value.urgency = 0;
-    ticket.value.description = '';
-    ticket.value.attachments = [];
-    rawFiles.value = [];
+  ticket.value.title = '';
+  ticket.value.urgency = 0;
+  ticket.value.description = '';
+  ticket.value.attachments = [];
+  rawFiles.value = [];
 
-  
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput) fileInput.value = '';
-  };
+  const fileInput = document.querySelector('input[type="file"]');
+  if (fileInput) fileInput.value = '';
+};
 
-
-
-
-  const submitTicket = async () => {
+const submitTicket = async () => {
   isUploading.value = true;
   try {
     const uploaded = [];
@@ -128,7 +119,6 @@ const resetForm = () => {
   }
 };
 
-
 onMounted(async () => {
   try {
     const dept = await getDepartmentById(departmentId);
@@ -142,56 +132,48 @@ onMounted(async () => {
   }
 });
 </script>
-  
-  <style scoped>
-    @import '../assets/css/newticket.css';
 
-    .uploading-message {
-  color: #ffd966;
+<style scoped>
+.uploading-message {
+  color: #ca0176;
   font-style: italic;
   font-size: 0.95rem;
   margin-top: -0.8rem;
   margin-bottom: -0.5rem;
 }
 
-    .category-description {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  background-color: #2c2c2c;
-  color: #ccc;
-  border-left: 4px solid #42b983;
-  border-radius: 5px;
-  font-style: italic;
-}
-
 .new-ticket-page {
   max-width: 700px;
   margin: 2rem auto;
   padding: 2rem;
-  background-color: #2a2a2a;
+  background-color: #ffffff; /* white background */
   border-radius: 12px;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
-  color: #eee;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  color: #333;
   font-family: 'Segoe UI', sans-serif;
 }
 
 .info-banner {
-  background-color: #333;
-  padding: 1rem;
-  border-radius: 10px;
   margin-bottom: 2rem;
-  border-left: 5px solid #42b983;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #333;
 }
 
 .info-banner p {
   margin: 0.3rem 0;
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .category-description {
-  color: #ccc;
-  margin-top: 0.5rem;
+  margin-top: 0.3rem;
   font-style: italic;
+  color: #555;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .ticket-form {
@@ -208,7 +190,7 @@ onMounted(async () => {
 label {
   margin-bottom: 0.3rem;
   font-weight: bold;
-  color: #fff;
+  color: #222;
 }
 
 input[type="text"],
@@ -216,9 +198,9 @@ input[type="file"],
 input,
 select,
 textarea {
-  background-color: #1e1e1e;
-  color: #eee;
-  border: 1px solid #444;
+  background-color: #f9f9f9;
+  color: #222;
+  border: 1px solid #ccc;
   border-radius: 6px;
   padding: 0.6rem;
   font-size: 1rem;
@@ -233,11 +215,11 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: #42b983;
+  border-color: #ca0176;
 }
 
 .submit-button {
-  background-color: #42b983;
+  background-color: #ca0176;
   color: #fff;
   padding: 0.8rem 1.2rem;
   border: none;
@@ -248,8 +230,28 @@ select:focus {
 }
 
 .submit-button:hover {
-  background-color: #36a573;
+  background-color: #a60060;
 }
 
-  </style>
-  
+.upload-preview {
+  margin-top: -0.5rem;
+}
+
+.upload-preview li {
+  font-size: 0.95rem;
+  margin: 4px 0;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.delete-btn {
+  margin-left: 8px;
+  background: transparent;
+  border: none;
+  color: #ca0176;
+  cursor: pointer;
+  font-size: 1rem;
+}
+</style>

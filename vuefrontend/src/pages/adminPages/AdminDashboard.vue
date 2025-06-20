@@ -9,7 +9,7 @@
           Manage Users
         </RouterLink>
 
-        <RouterLink to="/admin/departments" class="admin-link-button">
+        <RouterLink to="/admin/departments" class="admin-link-button-second">
           Departments & Categories
         </RouterLink>
       </div>
@@ -47,8 +47,20 @@ import AdminNavbar from '../../components/adminComponents/AdminNavbar.vue';
 }
 
 .admin-link-button {
-  background-color: #2a2a2a;
-  color: #eee;
+  background-color:white;
+  color: black;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+  border: 1px solid #555;
+  transition: 0.3s ease;
+}
+
+.admin-link-button-second {
+  background-color:white;
+  color: black;
   padding: 1rem;
   border-radius: 10px;
   text-align: center;
@@ -59,8 +71,12 @@ import AdminNavbar from '../../components/adminComponents/AdminNavbar.vue';
 }
 
 .admin-link-button:hover {
-  background-color: #414141;
-  color: #42b983;
-  border-color: #42b983;
+  color: #ca0176;
+  border-color: #ca0176;
+}
+
+.admin-link-button-second:hover {
+  color: #ca0176;
+  border-color: #ca0176;
 }
 </style>

@@ -56,8 +56,9 @@ onMounted(async () => {
 }
 
 .profile-card {
-  background-color: #2b2b2b;
+  background-color: white;
   padding: 1.5rem;
+  color: black;
   border-radius: 12px;
   max-width: 600px;
   margin: 0 auto;
@@ -70,14 +71,15 @@ onMounted(async () => {
 
 .access-summary {
   margin-top: 1rem;
-  background: #333;
+  color: black;
+  background: white;
   padding: 1rem;
   border-radius: 8px;
 }
 
 .access-summary ul {
   margin-left: 1.5rem;
-  color: #ccc;
+  color: black;
 }
 
 .access-summary li {

@@ -1,39 +1,33 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys.Tests\\TicketingSys.Tests.csproj": {}
+    "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\TicketingSys.Tests\\TicketingSys.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys.Tests\\TicketingSys.Tests.csproj": {
+    "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\TicketingSys.Tests\\TicketingSys.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys.Tests\\TicketingSys.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\TicketingSys.Tests\\TicketingSys.Tests.csproj",
         "projectName": "TicketingSys.Tests",
-        "projectPath": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys.Tests\\TicketingSys.Tests.csproj",
-        "packagesPath": "C:\\Users\\Bakir Mehremic\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys.Tests\\obj\\",
+        "projectPath": "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\TicketingSys.Tests\\TicketingSys.Tests.csproj",
+        "packagesPath": "C:\\Users\\Adi Cizmic\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\TicketingSys.Tests\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Bakir Mehremic\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Adi Cizmic\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys\\TicketingSys.csproj": {
-                "projectPath": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys\\TicketingSys.csproj"
+              "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\ticketingsys\\TicketingSys.csproj": {
+                "projectPath": "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\ticketingsys\\TicketingSys.csproj"
               }
             }
           }
@@ -47,8 +41,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -87,32 +80,26 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.408/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys\\TicketingSys.csproj": {
+    "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\ticketingsys\\TicketingSys.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys\\TicketingSys.csproj",
+        "projectUniqueName": "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\ticketingsys\\TicketingSys.csproj",
         "projectName": "TicketingSys",
-        "projectPath": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys\\TicketingSys.csproj",
-        "packagesPath": "C:\\Users\\Bakir Mehremic\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Bakir Mehremic\\Desktop\\TicketingSysRepo\\TicketingSys\\obj\\",
+        "projectPath": "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\ticketingsys\\TicketingSys.csproj",
+        "packagesPath": "C:\\Users\\Adi Cizmic\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Adi Cizmic\\Desktop\\TicketingSystem\\ticketingsys\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Bakir Mehremic\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Adi Cizmic\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -130,8 +117,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -223,7 +209,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.408/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

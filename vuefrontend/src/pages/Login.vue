@@ -22,23 +22,23 @@ const login = () => {
 };
 </script>
 
-<style scoped >
-
+<style scoped>
 .login-page {
   height: 100vh;
-  background-color: #232020;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: 'Poppins', sans-serif;
+  background: none; /* No background color */
 }
 
 .login-box {
-  background-color: #2e2c2c;
+  background-color: white; /* Visible box */
   padding: 40px;
   border-radius: 12px;
   text-align: center;
-  color: #acacac;
+  color: #333;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* subtle shadow */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,12 +53,12 @@ const login = () => {
 .login-heading {
   font-size: 1.8rem;
   margin-bottom: 30px;
-  color: whitesmoke;
+  color: #111;
 }
 
 .ms-login-button {
-  background-color: white;
-  color: #232020;
+  background-color: #0078D4; /* Microsoft blue */
+  color: white;
   font-weight: 600;
   border: none;
   padding: 12px 24px;
@@ -71,12 +71,11 @@ const login = () => {
 }
 
 .ms-login-button:hover {
-  background-color: #d6d6d6;
+  background-color: #005a9e;
   transform: translateY(-2px);
 }
 
 .ms-button-text {
   margin-left: 8px;
 }
-
 </style>
