@@ -265,7 +265,7 @@ onMounted(async () => {
 }
 
 .department-link h2:hover {
-  color:rgb(255, 255, 255);
+  color: #ca0176;
   text-decoration: none;
 }
 
