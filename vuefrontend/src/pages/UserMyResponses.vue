@@ -22,8 +22,8 @@
     <div class="responses-grid">
       <div v-for="ticket in filteredTickets" :key="ticket.id" class="ticket-card">
         <div class="ticket-card-header">
-          <strong class="ticket-title">Ticket #{{ ticket.id }}</strong>
-          <span class="ticket-date">{{ formatDateOnly(ticket.date) }}</span>
+          <strong class="ticket-title">Ticket #{{ ticket.ticketId }}</strong>
+          <span class="ticket-date">{{ formatDateOnly(ticket.createdAt) }}</span>
         </div>
         <p class="ticket-message">{{ ticket.message }}</p>
         <p class="ticket-status">Status: {{ ticket.status }}</p>
@@ -32,49 +32,57 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      filters: {
-        search: '',
-        status: '',
-        fromDate: '',
-        toDate: '',
-      },
-      tickets: [
-        {
-          id: 6,
-          date: '2025-06-12T13:24:23',
-          message: 'This will be done in short period of time',
-          status: 'Resolved',
-        },
-      ],
-    };
-  },
-  computed: {
-    filteredTickets() {
-      return this.tickets.filter((ticket) => {
-        const searchMatch = ticket.message
-          .toLowerCase()
-          .includes(this.filters.search.toLowerCase());
-        const statusMatch =
-          !this.filters.status || ticket.status === this.filters.status;
-        const fromDateMatch =
-          !this.filters.fromDate || new Date(ticket.date) >= new Date(this.filters.fromDate);
-        const toDateMatch =
-          !this.filters.toDate || new Date(ticket.date) <= new Date(this.filters.toDate);
+<script setup>
+import { ref, onMounted, computed } from 'vue'
+import { getResponsesToMyTickets } from '../api/userApi'
 
-        return searchMatch && statusMatch && fromDateMatch && toDateMatch;
-      });
-    },
-  },
-  methods: {
-    formatDateOnly(date) {
-      return new Date(date).toLocaleDateString();
-    },
-  },
-};
+const responses = ref([])
+
+const filters = ref({
+  search: '',
+  status: '',
+  fromDate: '',
+  toDate: '',
+})
+
+const formatDateOnly = (date) => new Date(date).toLocaleDateString()
+
+const fetchResponses = async () => {
+  const params = new URLSearchParams()
+  for (const key in filters.value) {
+    if (filters.value[key]) {
+      params.append(key, filters.value[key])
+    }
+  }
+
+  try {
+    responses.value = await getResponsesToMyTickets(params)
+  } catch (err) {
+    console.error('Failed to fetch responses:', err)
+    responses.value = []
+  }
+}
+
+const filteredTickets = computed(() => {
+  return responses.value.filter((ticket) => {
+    const searchMatch = ticket.message
+      ?.toLowerCase()
+      .includes(filters.value.search.toLowerCase())
+
+    const statusMatch =
+      !filters.value.status || ticket.status === filters.value.status
+
+    const fromDateMatch =
+      !filters.value.fromDate || new Date(ticket.createdAt) >= new Date(filters.value.fromDate)
+
+    const toDateMatch =
+      !filters.value.toDate || new Date(ticket.createdAt) <= new Date(filters.value.toDate)
+
+    return searchMatch && statusMatch && fromDateMatch && toDateMatch
+  })
+})
+
+onMounted(fetchResponses)
 </script>
 
 <style scoped>
@@ -93,7 +101,6 @@ h1 {
   text-align: center;
 }
 
-/* Filter bar */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -119,26 +126,30 @@ h1 {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Responses grid */
 .responses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
-  justify-content: center;
+  justify-items: center;
   width: 100%;
   max-width: 1140px;
 }
 
-/* Ticket card */
 .ticket-card {
   background-color: white;
   color: black;
   padding: 1.25rem;
   border-radius: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 240px;
+  min-height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 0.2s ease-in-out;
+}
+.ticket-card:hover {
+  transform: translateY(-4px);
 }
 
 .ticket-card-header {
