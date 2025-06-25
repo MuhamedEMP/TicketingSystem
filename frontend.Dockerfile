@@ -1,10 +1,15 @@
-
-FROM node:20-alpine
+# Build stage
+FROM node:20-alpine as build
 WORKDIR /app
 COPY ./vuefrontend/package*.json ./
-ENV NODE_ENV=development
-ENV VITE_API_BASE_URL=http://backend:5172
 RUN npm install
 COPY ./vuefrontend ./
-EXPOSE 5173
-CMD ["npm", "run", "dev", "--", "--host"]
+RUN npm run build
+
+# Serve stage
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY ./vuefrontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
